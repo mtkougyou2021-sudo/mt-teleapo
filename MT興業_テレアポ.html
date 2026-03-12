@@ -41,8 +41,8 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
 .sync-indicator{font-size:11px;padding:4px 8px;border-radius:5px;font-weight:700;white-space:nowrap;}
 .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;}
 .stat-card{background:#0f1f3a;border-radius:8px;padding:7px 6px;text-align:center;}
-.stat-num{font-size:20px;font-weight:900;line-height:1;}
-.stat-label{color:#334155;font-size:10px;margin-top:2px;}
+.stat-num{font-size:17px;font-weight:900;line-height:1;}
+.stat-label{color:#334155;font-size:9px;margin-top:2px;}
 .search-wrap{position:relative;}
 .filter-toggle{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:#1a3a6a;border:none;border-radius:5px;padding:6px 10px;color:#fff;font-size:11px;min-height:32px;}
 .filter-toggle.active{background:#1d4ed8;}
@@ -150,16 +150,24 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
             <button class="btn-gear" onclick="openM('sm')" title="同期設定">⚙</button>
           </div>
         </div>
-        <div class="stats">
+        <div class="stats" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr;">
           <div class="stat-card"><div class="stat-num" id="st" style="color:#94a3b8">0</div><div class="stat-label">総件数</div></div>
-          <div class="stat-card"><div class="stat-num" id="sa" style="color:#4ade80">0</div><div class="stat-label">アポ取得</div></div>
-          <div class="stat-card"><div class="stat-num" id="sb2" style="color:#38bdf8">0</div><div class="stat-label">折り返し</div></div>
+          <div class="stat-card"><div class="stat-num" id="sc" style="color:#fbbf24">0</div><div class="stat-label">架電数</div></div>
+          <div class="stat-card"><div class="stat-num" id="sr" style="color:#fb923c">0%</div><div class="stat-label">架電率</div></div>
+          <div class="stat-card"><div class="stat-num" id="sa" style="color:#4ade80">0</div><div class="stat-label">アポ</div></div>
+          <div class="stat-card"><div class="stat-num" id="sb2" style="color:#38bdf8">0</div><div class="stat-label">折返し</div></div>
         </div>
         <div class="search-wrap">
           <input type="text" id="qi" placeholder="会社名 / 住所で検索..." oninput="renderList()" style="padding-right:60px;font-size:14px;"/>
           <button class="filter-toggle" id="ftb" onclick="toggleF()">絞込</button>
         </div>
-        <div class="filters" id="filters">
+        <div class="filters" id="filters" style="grid-template-columns:1fr 1fr 1fr;">
+          <select id="fa2" onchange="renderList()">
+            <option value="">全エリア</option>
+            <option value="愛知">愛知</option>
+            <option value="三重">三重</option>
+            <option value="岐阜">岐阜</option>
+          </select>
           <select id="fs" onchange="renderList()">
             <option value="">全ステータス</option>
           </select>
@@ -530,7 +538,12 @@ function updateFilterOptions(){
   sel.value=cur;
 }
 function rAll(){
-  document.getElementById('st').textContent=cos.length;
+  const total=cos.length;
+  const called=cos.filter(c=>c.callHistory&&c.callHistory.length>0).length;
+  const rate=total>0?Math.round(called/total*100):0;
+  document.getElementById('st').textContent=total;
+  document.getElementById('sc').textContent=called;
+  document.getElementById('sr').textContent=rate+'%';
   document.getElementById('sa').textContent=cos.filter(c=>c.status==='アポ取得').length;
   document.getElementById('sb2').textContent=cos.filter(c=>c.status==='折り返し待').length;
   updateFilterOptions();
@@ -542,7 +555,8 @@ function renderList(){
   const q=document.getElementById('qi').value.toLowerCase();
   const fs=document.getElementById('fs').value;
   const fi=document.getElementById('fi').value;
-  const f=cos.filter(c=>(!q||c.companyName.toLowerCase().includes(q)||(c.address||'').toLowerCase().includes(q))&&(!fs||c.status===fs)&&(!fi||c.industry===fi));
+  const fa2=document.getElementById('fa2').value;
+  const f=cos.filter(c=>(!q||c.companyName.toLowerCase().includes(q)||(c.address||'').toLowerCase().includes(q)||(c.contactName||'').toLowerCase().includes(q))&&(!fs||c.status===fs)&&(!fi||c.industry===fi)&&(!fa2||(c.address||'').includes(fa2)));
   document.getElementById('lf').textContent=f.length+' / '+cos.length+' 件';
   const bd=document.getElementById('list-body');
   if(!f.length){
