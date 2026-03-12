@@ -4,8 +4,8 @@
   "description": "MT興業 テレアポ管理システム",
   "start_url": "./MT興業_テレアポ.html",
   "display": "standalone",
-  "background_color": "#070e1a",
-  "theme_color": "#0a1628",
+  "background_color": "#1a1a1a",
+  "theme_color": "#222222",
   "orientation": "any",
   "icons": [
     {
