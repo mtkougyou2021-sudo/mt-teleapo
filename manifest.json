@@ -1,0 +1,22 @@
+{
+  "name": "MT興業 テレアポシステム",
+  "short_name": "MTテレアポ",
+  "description": "MT興業 テレアポ管理システム",
+  "start_url": "./MT興業_テレアポ.html",
+  "display": "standalone",
+  "background_color": "#070e1a",
+  "theme_color": "#0a1628",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
