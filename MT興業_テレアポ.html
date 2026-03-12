@@ -217,7 +217,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
     <div class="fg">
       <div class="ff full"><label class="fl">会社名 *</label><input type="text" id="fc"/></div>
       <div class="ff full"><label class="fl">住所</label><input type="text" id="fa"/></div>
-      <div class="ff"><label class="fl">電話番号</label><input type="tel" id="fp"/></div>
+      <div class="ff"><label class="fl">電話番号 *</label><input type="tel" id="fp" inputmode="tel" pattern="[0-9\-]*" placeholder="例: 03-1234-5678"/></div>
       <div class="ff"><label class="fl">担当者名</label><input type="text" id="fct"/></div>
       <div class="ff"><label class="fl">役職</label><input type="text" id="ftl"/></div>
       <div class="ff">
@@ -567,8 +567,15 @@ function swTab(n){
 
 function openAdd(){fMode='add';document.getElementById('fmt').textContent='+ 新規業者を追加';['fc','fa','fp','fct','ftl','fmo','fap'].forEach(id=>document.getElementById(id).value='');document.getElementById('fin').value='';openM('fm');}
 function openEdit(){const c=getSel();if(!c)return;fMode='edit';document.getElementById('fmt').textContent='情報を編集';document.getElementById('fc').value=c.companyName||'';document.getElementById('fa').value=c.address||'';document.getElementById('fp').value=c.phone||'';document.getElementById('fct').value=c.contactName||'';document.getElementById('ftl').value=c.contactTitle||'';document.getElementById('fin').value=c.industry||'';document.getElementById('fap').value=c.nextAppointment||'';document.getElementById('fmo').value=c.memo||'';openM('fm');}
+function validatePhone(p){
+  const cleaned=p.replace(/[\s\-\u3000\uff0d（）()]/g,'').replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0));
+  return /^0\d{9,10}$/.test(cleaned);
+}
 function saveForm(){
   const name=document.getElementById('fc').value.trim();if(!name){alert('会社名は必須です');return;}
+  const phone=document.getElementById('fp').value.trim();
+  if(!phone){alert('電話番号は必須です');return;}
+  if(!validatePhone(phone)){alert('正しい電話番号を入力してください\n例: 03-1234-5678');return;}
   if(fMode==='add'){const c=nc();c.companyName=name;c.address=document.getElementById('fa').value;c.phone=document.getElementById('fp').value;c.contactName=document.getElementById('fct').value;c.contactTitle=document.getElementById('ftl').value;c.industry=document.getElementById('fin').value;c.nextAppointment=document.getElementById('fap').value;c.memo=document.getElementById('fmo').value;cos.push(c);selId=c.id;}
   else{const c=getSel();if(!c)return;c.companyName=name;c.address=document.getElementById('fa').value;c.phone=document.getElementById('fp').value;c.contactName=document.getElementById('fct').value;c.contactTitle=document.getElementById('ftl').value;c.industry=document.getElementById('fin').value;c.nextAppointment=document.getElementById('fap').value;c.memo=document.getElementById('fmo').value;}
   save();closeM('fm');rAll();renderDetail();
@@ -621,6 +628,11 @@ window.addEventListener('resize',()=>{if(window.innerWidth>=768){document.getEle
     if(t){localStorage.setItem(GH_TOKEN_KEY,t);window.location.hash='';}
   }
 })();
+
+// Phone input: only allow digits and hyphens
+document.getElementById('fp').addEventListener('input',function(){
+  this.value=this.value.replace(/[^0-9\-]/g,'');
+});
 
 cos=loadLocal();rAll();
 // Auto-sync on load
