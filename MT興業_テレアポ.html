@@ -162,8 +162,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
         <div class="filters" id="filters">
           <select id="fs" onchange="renderList()">
             <option value="">全ステータス</option>
-            <option>未対応</option><option>電話中</option><option>不在</option>
-            <option>折り返し待</option><option>アポ取得</option><option>お断り</option><option>検討中</option>
           </select>
           <select id="fi" onchange="renderList()">
             <option value="">全業種</option>
@@ -251,8 +249,12 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
       <div class="fl" style="margin-bottom:8px">ステータス更新</div>
       <div class="sg" id="sbg"></div>
     </div>
+    <div style="margin-bottom:12px"><label class="fl">担当者名</label><input type="text" id="lcontact" placeholder="対応した担当者名"/></div>
     <div style="margin-bottom:12px"><label class="fl">次回アポ日時</label><input type="datetime-local" id="lap"/></div>
-    <div style="margin-bottom:18px"><label class="fl">メモ（任意）</label><textarea rows="3" id="lno" placeholder="担当者の反応など..."></textarea></div>
+    <div style="margin-bottom:18px">
+      <button type="button" onclick="toggleMemo()" style="background:transparent;border:none;color:#475569;font-size:12px;padding:4px 0;cursor:pointer;" id="memo-toggle">+ メモを追加</button>
+      <div id="memo-wrap" style="display:none;margin-top:6px;"><textarea rows="2" id="lno" placeholder="メモ（任意）" style="font-size:13px;"></textarea></div>
+    </div>
     <div class="ma">
       <button class="btn btn-p btn-full" onclick="saveLog()">保存する</button>
       <button class="btn btn-2" onclick="closeM('lm')" style="padding:14px 18px">キャンセル</button>
@@ -260,27 +262,48 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
   </div>
 </div>
 
-<!-- SYNC SETTINGS MODAL -->
+<!-- SETTINGS MODAL -->
 <div class="modal-ov" id="sm" onclick="bgClick(event,'sm')">
   <div class="modal-box">
     <div class="modal-handle"></div>
-    <div class="modal-title">⚙ データ同期設定</div>
-    <div style="margin-bottom:16px;color:#94a3b8;font-size:13px;line-height:1.7;">
-      PCとiPhoneでデータを共有するには、GitHubトークンを入力してください。<br/>
-      PCでは自動設定済みの場合があります。
+    <div class="modal-title">⚙ 設定</div>
+
+    <!-- 架電結果カスタマイズ -->
+    <div style="margin-bottom:20px;">
+      <div class="fl" style="margin-bottom:8px;font-size:13px;color:#e2e8f0;font-weight:700;">架電結果</div>
+      <div id="cfg-cr" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;"></div>
+      <div style="display:flex;gap:6px;">
+        <input type="text" id="new-cr" placeholder="新しい架電結果を追加" style="font-size:13px;flex:1;"/>
+        <button class="btn-add" onclick="addCR()" style="white-space:nowrap;">追加</button>
+      </div>
     </div>
-    <div class="ff" style="margin-bottom:12px">
-      <label class="fl">GitHubトークン</label>
-      <input type="text" id="gh-token" placeholder="ghp_xxxx または gho_xxxx" style="font-size:14px;"/>
+
+    <!-- ステータスカスタマイズ -->
+    <div style="margin-bottom:20px;">
+      <div class="fl" style="margin-bottom:8px;font-size:13px;color:#e2e8f0;font-weight:700;">ステータス</div>
+      <div id="cfg-sl" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;"></div>
+      <div style="display:flex;gap:6px;">
+        <input type="text" id="new-sl" placeholder="新しいステータスを追加" style="font-size:13px;flex:1;"/>
+        <button class="btn-add" onclick="addSL()" style="white-space:nowrap;">追加</button>
+      </div>
     </div>
-    <div style="margin-bottom:16px">
-      <div id="sync-status" style="color:#475569;font-size:12px;"></div>
+
+    <div style="border-top:1px solid #1a3a6a;padding-top:16px;margin-bottom:16px;">
+      <div class="fl" style="margin-bottom:8px;font-size:13px;color:#e2e8f0;font-weight:700;">データ同期</div>
+      <div class="ff" style="margin-bottom:12px">
+        <label class="fl">GitHubトークン</label>
+        <input type="text" id="gh-token" placeholder="ghp_xxxx または gho_xxxx" style="font-size:14px;"/>
+      </div>
+      <div style="margin-bottom:12px">
+        <div id="sync-status" style="color:#475569;font-size:12px;"></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-p" onclick="saveSyncSettings()" style="flex:1;">保存して同期</button>
+        <button class="btn" onclick="manualSync()" style="flex:1;background:#0f2040;color:#38bdf8;border:1px solid #1a4a7a;">手動同期</button>
+      </div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:10px;">
-      <button class="btn btn-p btn-full" onclick="saveSyncSettings()">保存してデータ同期</button>
-      <button class="btn btn-full" onclick="manualSync()" style="background:#0f2040;color:#38bdf8;border:1px solid #1a4a7a;">手動で同期を実行</button>
-      <button class="btn btn-2 btn-full" onclick="closeM('sm')">閉じる</button>
-    </div>
+
+    <button class="btn btn-2 btn-full" onclick="closeM('sm')">閉じる</button>
   </div>
 </div>
 
@@ -290,7 +313,7 @@ const GH_REPO='mtkougyou2021-sudo/mt-teleapo';
 const GH_FILE='data.json';
 const GH_TOKEN_KEY='mt-teleapo-gh-token';
 
-const SL=[
+const DEFAULT_SL=[
   {v:'未対応',c:'#94a3b8',bg:'#1e293b',i:'○'},
   {v:'電話中',c:'#fbbf24',bg:'#2d1f00',i:'📞'},
   {v:'不在',c:'#818cf8',bg:'#1e1b4b',i:'🔔'},
@@ -299,7 +322,17 @@ const SL=[
   {v:'お断り',c:'#f87171',bg:'#2d0a0a',i:'✕'},
   {v:'検討中',c:'#fb923c',bg:'#2d1200',i:'💭'},
 ];
-const CR=['不在','担当者不在','折り返し約束','アポ取得','お断り','検討中','再架電'];
+const DEFAULT_CR=['不在','担当者不在','折り返し約束','アポ取得','お断り','検討中','再架電'];
+const COLORS=['#94a3b8','#fbbf24','#818cf8','#38bdf8','#4ade80','#f87171','#fb923c','#a78bfa','#f472b6','#34d399','#fcd34d','#67e8f9'];
+const BGS=['#1e293b','#2d1f00','#1e1b4b','#0c2330','#052e16','#2d0a0a','#2d1200','#1e1040','#2d0a1a','#042f1e','#2d2600','#062c30'];
+
+function loadSL(){try{const d=localStorage.getItem('mt-teleapo-sl');return d?JSON.parse(d):DEFAULT_SL.slice();}catch{return DEFAULT_SL.slice();}}
+function loadCR(){try{const d=localStorage.getItem('mt-teleapo-cr');return d?JSON.parse(d):DEFAULT_CR.slice();}catch{return DEFAULT_CR.slice();}}
+function saveSL(){localStorage.setItem('mt-teleapo-sl',JSON.stringify(SL));}
+function saveCR(){localStorage.setItem('mt-teleapo-cr',JSON.stringify(CR));}
+
+let SL=loadSL();
+let CR=loadCR();
 const FM={companyName:['会社名','会社','company','企業名','業者名'],address:['住所','address','所在地'],industry:['業種','業態','industry'],phone:['電話','tel','phone','電話番号'],contactName:['担当者','担当','contact','氏名','名前'],contactTitle:['役職','肩書','title'],memo:['備考','メモ','note','memo']};
 
 let cos=[],selId=null,fMode='add',lRes='',lStat='',ghSha=null;
@@ -490,10 +523,17 @@ function handleCSV(inp){
   r.readAsText(file,'UTF-8');inp.value='';
 }
 
+function updateFilterOptions(){
+  const sel=document.getElementById('fs');
+  const cur=sel.value;
+  sel.innerHTML='<option value="">全ステータス</option>'+SL.map(s=>`<option>${s.v}</option>`).join('');
+  sel.value=cur;
+}
 function rAll(){
   document.getElementById('st').textContent=cos.length;
   document.getElementById('sa').textContent=cos.filter(c=>c.status==='アポ取得').length;
   document.getElementById('sb2').textContent=cos.filter(c=>c.status==='折り返し待').length;
+  updateFilterOptions();
   renderList();
   if(selId)renderDetail();
 }
@@ -538,7 +578,7 @@ function renderDetail(){
   h+='</div>';
   document.getElementById('t0').innerHTML=h;
   document.getElementById('tb1').textContent='📞 履歴 ('+(c.callHistory?.length||0)+'件)';
-  document.getElementById('t1').innerHTML=!c.callHistory?.length?'<div style="text-align:center;padding:40px;color:#334155;"><div style="font-size:32px;margin-bottom:8px">📞</div>まだ架電記録がありません</div>':c.callHistory.map(lg=>`<div class="hc"><div class="hc-top"><span class="hc-date">${lg.date}</span><span class="hc-result">${lg.result}</span></div>${lg.note?`<div style="color:#94a3b8;font-size:13px;line-height:1.6">${esc(lg.note)}</div>`:''}${lg.nextDate?`<div style="color:#f59e0b;font-size:12px;margin-top:6px">📅 次回: ${fdt(lg.nextDate)}</div>`:''}</div>`).join('');
+  document.getElementById('t1').innerHTML=!c.callHistory?.length?'<div style="text-align:center;padding:40px;color:#334155;"><div style="font-size:32px;margin-bottom:8px">📞</div>まだ架電記録がありません</div>':c.callHistory.map(lg=>`<div class="hc"><div class="hc-top"><span class="hc-date">${lg.date}</span><span class="hc-result">${lg.result}</span></div>${lg.contact?`<div style="color:#60a5fa;font-size:12px;margin-bottom:4px;">👤 ${esc(lg.contact)}</div>`:''}${lg.note?`<div style="color:#94a3b8;font-size:13px;line-height:1.6">${esc(lg.note)}</div>`:''}${lg.nextDate?`<div style="color:#f59e0b;font-size:12px;margin-top:6px">📅 次回: ${fdt(lg.nextDate)}</div>`:''}</div>`).join('');
 }
 
 function selCo(id){
@@ -581,12 +621,22 @@ function saveForm(){
   save();closeM('fm');rAll();renderDetail();
 }
 
+function toggleMemo(){
+  const w=document.getElementById('memo-wrap');
+  const t=document.getElementById('memo-toggle');
+  if(w.style.display==='none'){w.style.display='block';t.textContent='- メモを閉じる';}
+  else{w.style.display='none';t.textContent='+ メモを追加';}
+}
+
 function openLog(){
   const c=getSel();if(!c)return;
   lRes='';lStat=c.status;
   document.getElementById('lmt').textContent='📞 架電記録 — '+c.companyName;
+  document.getElementById('lcontact').value=c.contactName||'';
   document.getElementById('lap').value=c.nextAppointment||'';
   document.getElementById('lno').value='';
+  document.getElementById('memo-wrap').style.display='none';
+  document.getElementById('memo-toggle').textContent='+ メモを追加';
   document.getElementById('rb').innerHTML=CR.map(r=>`<button class="rb" onclick="selRes('${r}')">${r}</button>`).join('');
   document.getElementById('sbg').innerHTML=SL.map(s=>`<button class="sb" onclick="selStat('${s.v}')" style="background:${lStat===s.v?s.bg:'#0f2040'};color:${lStat===s.v?s.c:'#475569'};border-color:${lStat===s.v?s.c:'#1a3a6a'}">${s.v}</button>`).join('');
   openM('lm');
@@ -605,14 +655,53 @@ function selStat(v){
 function saveLog(){
   if(!lRes){alert('架電結果を選んでください');return;}
   const c=getSel();if(!c)return;
-  const log={id:Date.now(),date:new Date().toLocaleString('ja-JP'),result:lRes,note:document.getElementById('lno').value,nextDate:document.getElementById('lap').value};
-  c.callHistory=[log,...(c.callHistory||[])];c.status=lStat;c.nextAppointment=document.getElementById('lap').value||c.nextAppointment;
+  const contact=document.getElementById('lcontact').value.trim();
+  const log={id:Date.now(),date:new Date().toLocaleString('ja-JP'),result:lRes,contact:contact,note:document.getElementById('lno').value,nextDate:document.getElementById('lap').value};
+  c.callHistory=[log,...(c.callHistory||[])];c.status=lStat;
+  if(contact)c.contactName=contact;
+  c.nextAppointment=document.getElementById('lap').value||c.nextAppointment;
   save();closeM('lm');rAll();renderDetail();
+}
+
+// --- Settings: customize call results & statuses ---
+function renderCfgCR(){
+  document.getElementById('cfg-cr').innerHTML=CR.map((r,i)=>
+    `<span style="background:#0f2040;border:1px solid #1a3a6a;border-radius:8px;padding:6px 10px;font-size:13px;color:#94a3b8;display:inline-flex;align-items:center;gap:6px;">${esc(r)}<button onclick="removeCR(${i})" style="background:none;border:none;color:#f87171;font-size:14px;padding:0 2px;cursor:pointer;line-height:1;">×</button></span>`
+  ).join('');
+}
+function renderCfgSL(){
+  document.getElementById('cfg-sl').innerHTML=SL.map((s,i)=>
+    `<span style="background:${s.bg};border:1px solid ${s.c}55;border-radius:8px;padding:6px 10px;font-size:13px;color:${s.c};display:inline-flex;align-items:center;gap:6px;">${s.v}<button onclick="removeSL(${i})" style="background:none;border:none;color:#f87171;font-size:14px;padding:0 2px;cursor:pointer;line-height:1;">×</button></span>`
+  ).join('');
+}
+function addCR(){
+  const inp=document.getElementById('new-cr');
+  const v=inp.value.trim();
+  if(!v){return;}
+  if(CR.includes(v)){alert('既に存在します');return;}
+  CR.push(v);saveCR();renderCfgCR();inp.value='';
+}
+function removeCR(i){
+  if(!confirm('「'+CR[i]+'」を削除しますか？'))return;
+  CR.splice(i,1);saveCR();renderCfgCR();
+}
+function addSL(){
+  const inp=document.getElementById('new-sl');
+  const v=inp.value.trim();
+  if(!v){return;}
+  if(SL.some(s=>s.v===v)){alert('既に存在します');return;}
+  const ci=SL.length%COLORS.length;
+  SL.push({v:v,c:COLORS[ci],bg:BGS[ci],i:'●'});
+  saveSL();renderCfgSL();inp.value='';
+}
+function removeSL(i){
+  if(!confirm('「'+SL[i].v+'」を削除しますか？'))return;
+  SL.splice(i,1);saveSL();renderCfgSL();
 }
 
 function openM(id){
   document.getElementById(id).classList.add('open');
-  if(id==='sm'){document.getElementById('gh-token').value=getToken();document.getElementById('sync-status').textContent='';}
+  if(id==='sm'){document.getElementById('gh-token').value=getToken();document.getElementById('sync-status').textContent='';renderCfgCR();renderCfgSL();}
 }
 function closeM(id){document.getElementById(id).classList.remove('open');}
 function bgClick(e,id){if(e.target===e.currentTarget)closeM(id);}
