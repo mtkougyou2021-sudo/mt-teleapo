@@ -613,6 +613,15 @@ function toggleF(){const f=document.getElementById('filters');const b=document.g
 window.addEventListener('resize',()=>{if(window.innerWidth>=768){document.getElementById('list-panel').style.display='';document.getElementById('detail-panel').style.display='';}});
 
 // --- Init ---
+// Auto-detect token from URL hash: ...html#token=gho_xxx
+(function(){
+  const hash=window.location.hash;
+  if(hash.includes('token=')){
+    const t=hash.split('token=')[1];
+    if(t){localStorage.setItem(GH_TOKEN_KEY,t);window.location.hash='';}
+  }
+})();
+
 cos=loadLocal();rAll();
 // Auto-sync on load
 syncFromGitHub().then(()=>rAll());
