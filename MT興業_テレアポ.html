@@ -343,9 +343,9 @@ let SL=loadSL();
 let CR=loadCR();
 const FM={companyName:['会社名','会社','company','企業名','業者名'],address:['住所','address','所在地'],industry:['業種','業態','industry'],phone:['電話','tel','phone','電話番号'],contactName:['担当者','担当','contact','氏名','名前'],contactTitle:['役職','肩書','title'],memo:['備考','メモ','note','memo']};
 
-let cos=[],selId=null,fMode='add',lRes='',lStat='',ghSha=null;
+let cos=[],selId=null,fMode='add',lRes='',lStat='',ghSha=null,isSaving=false;
 
-const nc=()=>({id:`${Date.now()}-${Math.random()}`,companyName:'',address:'',industry:'',phone:'',contactName:'',contactTitle:'',memo:'',status:'未対応',nextAppointment:'',callHistory:[],createdAt:new Date().toISOString()});
+const nc=()=>({id:`${Date.now()}-${Math.random()}`,companyName:'',address:'',industry:'',phone:'',contactName:'',contactTitle:'',memo:'',status:'未対応',nextAppointment:'',callHistory:[],createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()});
 const loadLocal=()=>{try{const d=localStorage.getItem(SK);return d?JSON.parse(d):[];}catch{return[];}};
 const saveLocal=()=>{try{localStorage.setItem(SK,JSON.stringify(cos));}catch{}};
 const getSel=()=>cos.find(c=>c.id===selId)||null;
@@ -421,22 +421,42 @@ async function ghWrite(data){
   }catch{return false;}
 }
 
+function mergeData(local,remote){
+  // Smart merge: for each entry, keep the one with more call history or more recent update
+  const localMap=new Map(local.map(c=>[c.id,c]));
+  const remoteMap=new Map(remote.map(c=>[c.id,c]));
+  const allIds=new Set([...localMap.keys(),...remoteMap.keys()]);
+  const merged=[];
+  allIds.forEach(id=>{
+    const l=localMap.get(id);
+    const r=remoteMap.get(id);
+    if(!l){merged.push(r);return;}
+    if(!r){merged.push(l);return;}
+    // Both exist: keep the one with more call history, or more recent updatedAt
+    const lHist=(l.callHistory||[]).length;
+    const rHist=(r.callHistory||[]).length;
+    if(lHist!==rHist){merged.push(lHist>rHist?l:r);return;}
+    const lTime=new Date(l.updatedAt||l.createdAt||0).getTime();
+    const rTime=new Date(r.updatedAt||r.createdAt||0).getTime();
+    merged.push(lTime>=rTime?l:r);
+  });
+  return merged;
+}
+
 async function syncFromGitHub(){
   showLoading(true);
   updateSyncIndicator('syncing');
   const remote=await ghRead();
   if(remote&&Array.isArray(remote)){
-    // Merge: remote data is the source of truth, but keep local-only entries
-    const remoteIds=new Set(remote.map(c=>c.id));
-    const localOnly=cos.filter(c=>!remoteIds.has(c.id));
-    cos=[...remote,...localOnly];
+    cos=mergeData(cos,remote);
     saveLocal();
     rAll();
+    // Push merged result back
+    if(getToken())await ghWrite(cos);
     updateSyncIndicator('ok');
     showLoading(false);
     return true;
   }else{
-    // No remote data, push local to remote
     if(cos.length>0&&getToken()){
       const ok=await ghWrite(cos);
       updateSyncIndicator(ok?'ok':'error');
@@ -449,18 +469,20 @@ async function syncFromGitHub(){
 }
 
 async function syncToGitHub(){
-  if(!getToken())return;
+  if(!getToken()||isSaving)return;
+  isSaving=true;
   updateSyncIndicator('syncing');
   const ok=await ghWrite(cos);
   updateSyncIndicator(ok?'ok':'error');
+  isSaving=false;
+  return ok;
 }
 
-// Debounced save: save local immediately, sync to GitHub with delay
-let syncTimer=null;
-function save(){
+// Save: local immediately + GitHub sync immediately (await)
+async function save(){
   saveLocal();
-  if(syncTimer)clearTimeout(syncTimer);
-  syncTimer=setTimeout(()=>syncToGitHub(),2000);
+  updateSyncIndicator('syncing');
+  await syncToGitHub();
 }
 
 async function manualSync(){
@@ -604,7 +626,7 @@ function closeDetail(){
   document.getElementById('detail-panel').style.display='';
   selId=null;renderList();
 }
-function delSel(){if(!confirm('この業者を削除しますか？'))return;cos=cos.filter(c=>c.id!==selId);selId=null;save();closeDetail();rAll();}
+async function delSel(){if(!confirm('この業者を削除しますか？'))return;cos=cos.filter(c=>c.id!==selId);selId=null;await save();closeDetail();rAll();}
 function doCall(){
   const c=getSel();
   if(!c||!c.phone){alert('電話番号が登録されていません');return;}
@@ -625,14 +647,14 @@ function validatePhone(p){
   const cleaned=p.replace(/[\s\-\u3000\uff0d（）()]/g,'').replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0));
   return /^0\d{9,10}$/.test(cleaned);
 }
-function saveForm(){
+async function saveForm(){
   const name=document.getElementById('fc').value.trim();if(!name){alert('会社名は必須です');return;}
   const phone=document.getElementById('fp').value.trim();
   if(!phone){alert('電話番号は必須です');return;}
   if(!validatePhone(phone)){alert('正しい電話番号を入力してください\n例: 03-1234-5678');return;}
   if(fMode==='add'){const c=nc();c.companyName=name;c.address=document.getElementById('fa').value;c.phone=document.getElementById('fp').value;c.contactName=document.getElementById('fct').value;c.contactTitle=document.getElementById('ftl').value;c.industry=document.getElementById('fin').value;c.nextAppointment=document.getElementById('fap').value;c.memo=document.getElementById('fmo').value;cos.push(c);selId=c.id;}
-  else{const c=getSel();if(!c)return;c.companyName=name;c.address=document.getElementById('fa').value;c.phone=document.getElementById('fp').value;c.contactName=document.getElementById('fct').value;c.contactTitle=document.getElementById('ftl').value;c.industry=document.getElementById('fin').value;c.nextAppointment=document.getElementById('fap').value;c.memo=document.getElementById('fmo').value;}
-  save();closeM('fm');rAll();renderDetail();
+  else{const c=getSel();if(!c)return;c.companyName=name;c.address=document.getElementById('fa').value;c.phone=document.getElementById('fp').value;c.contactName=document.getElementById('fct').value;c.contactTitle=document.getElementById('ftl').value;c.industry=document.getElementById('fin').value;c.nextAppointment=document.getElementById('fap').value;c.memo=document.getElementById('fmo').value;c.updatedAt=new Date().toISOString();}
+  closeM('fm');rAll();renderDetail();await save();
 }
 
 function toggleMemo(){
@@ -666,7 +688,7 @@ function selStat(v){
     if(s){b.style.background=b.textContent===v?s.bg:'#0f2040';b.style.color=b.textContent===v?s.c:'#475569';b.style.borderColor=b.textContent===v?s.c:'#1a3a6a';}
   });
 }
-function saveLog(){
+async function saveLog(){
   if(!lRes){alert('架電結果を選んでください');return;}
   const c=getSel();if(!c)return;
   const contact=document.getElementById('lcontact').value.trim();
@@ -674,7 +696,8 @@ function saveLog(){
   c.callHistory=[log,...(c.callHistory||[])];c.status=lStat;
   if(contact)c.contactName=contact;
   c.nextAppointment=document.getElementById('lap').value||c.nextAppointment;
-  save();closeM('lm');rAll();renderDetail();
+  c.updatedAt=new Date().toISOString();
+  closeM('lm');rAll();renderDetail();await save();
 }
 
 // --- Settings: customize call results & statuses ---
@@ -740,6 +763,18 @@ document.getElementById('fp').addEventListener('input',function(){
 cos=loadLocal();rAll();
 // Auto-sync on load
 syncFromGitHub().then(()=>rAll());
+
+// Save to GitHub when app is about to close/hide (iOS Safari)
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='hidden'){
+    saveLocal();
+    if(getToken()){
+      // Use sendBeacon as last resort for quick sync signal, plus try fetch
+      syncToGitHub();
+    }
+  }
+});
+window.addEventListener('pagehide',()=>{saveLocal();});
 
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 </script>
