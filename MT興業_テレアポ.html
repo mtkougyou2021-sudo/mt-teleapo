@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="MTテレアポ"/>
@@ -10,10 +10,10 @@
 <link rel="apple-touch-icon" href="icon-192.png"/>
 <title>MT興業 テレアポ</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;background:#070e1a;font-family:'Hiragino Kaku Gothic ProN','Hiragino Sans','Meiryo',sans-serif;color:#e2e8f0;overflow:hidden;}
-button{cursor:pointer;font-family:inherit;}
-input,select,textarea{font-family:inherit;color:#e2e8f0;background:#0a1628;border:1.5px solid #1a3a6a;border-radius:8px;padding:10px 12px;font-size:14px;outline:none;width:100%;box-sizing:border-box;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+html,body{height:100%;background:#070e1a;font-family:-apple-system,'Hiragino Kaku Gothic ProN','Hiragino Sans','Meiryo',sans-serif;color:#e2e8f0;overflow:hidden;}
+button{cursor:pointer;font-family:inherit;touch-action:manipulation;-webkit-appearance:none;}
+input,select,textarea{font-family:inherit;color:#e2e8f0;background:#0a1628;border:1.5px solid #1a3a6a;border-radius:8px;padding:12px 14px;font-size:16px;outline:none;width:100%;box-sizing:border-box;-webkit-appearance:none;}
 select option{background:#0f172a;}
 textarea{resize:vertical;}
 input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.7);}
@@ -21,7 +21,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
 ::-webkit-scrollbar-track{background:#0a1628;}
 ::-webkit-scrollbar-thumb{background:#1a3a6a;border-radius:2px;}
 
-#app{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);}
 #main{flex:1;display:flex;overflow:hidden;}
 #list-panel{display:flex;flex-direction:column;width:100%;overflow:hidden;background:#070e1a;}
 #detail-panel{display:none;flex-direction:column;flex:1;overflow:hidden;background:#070e1a;}
@@ -37,25 +37,26 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
 .logo{font-size:20px;font-weight:900;letter-spacing:0.08em;color:#e2e8f0;}
 .logo span{color:#f97316;}
 .logo small{color:#64748b;font-size:12px;font-weight:400;margin-left:8px;}
-.header-btns{display:flex;gap:8px;}
+.header-btns{display:flex;gap:8px;align-items:center;}
+.sync-indicator{font-size:11px;padding:4px 8px;border-radius:5px;font-weight:700;white-space:nowrap;}
 .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;}
 .stat-card{background:#0f1f3a;border-radius:8px;padding:7px 6px;text-align:center;}
 .stat-num{font-size:20px;font-weight:900;line-height:1;}
 .stat-label{color:#334155;font-size:10px;margin-top:2px;}
 .search-wrap{position:relative;}
-.filter-toggle{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:#1a3a6a;border:none;border-radius:5px;padding:4px 9px;color:#fff;font-size:10px;}
+.filter-toggle{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:#1a3a6a;border:none;border-radius:5px;padding:6px 10px;color:#fff;font-size:11px;min-height:32px;}
 .filter-toggle.active{background:#1d4ed8;}
 .filters{display:none;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
 .filters.open{display:grid;}
-.filters select{padding:8px 10px;font-size:12px;}
+.filters select{padding:10px 12px;font-size:13px;}
 
-#list-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+#list-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
 .list-empty{text-align:center;padding:50px 24px;color:#334155;}
 .list-empty .ei{font-size:44px;margin-bottom:10px;}
 .list-empty p{color:#475569;font-size:14px;}
 .list-empty small{color:#1e3a5f;font-size:12px;margin-top:6px;display:block;}
-.li{background:#0a1628;border-bottom:1px solid #0f2040;border-left:4px solid transparent;padding:12px 16px;cursor:pointer;transition:background 0.1s;}
-.li:hover{background:#0d1a2e;}
+.li{background:#0a1628;border-bottom:1px solid #0f2040;border-left:4px solid transparent;padding:14px 16px;cursor:pointer;transition:background 0.1s;min-height:56px;}
+.li:active{background:#152244;}
 .li.active{background:#0f1f3a;}
 .li-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;}
 .li-name{font-size:15px;font-weight:700;color:#e2e8f0;flex:1;padding-right:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -73,13 +74,14 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
 .d-name{font-size:17px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:6px;}
 .d-top-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;}
 .d-btns{display:flex;gap:8px;flex-shrink:0;}
-.call-btn{width:100%;border:none;border-radius:12px;padding:16px;font-size:17px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;letter-spacing:0.04em;background:linear-gradient(135deg,#15803d,#22c55e);color:#fff;box-shadow:0 4px 20px #22c55e45;}
-@media(max-width:767px){.call-btn{padding:18px;font-size:18px;}}
-.log-btn{width:100%;margin-top:8px;background:#0f2040;color:#38bdf8;border:1.5px solid #1a4a7a;border-radius:10px;padding:11px;font-size:13px;font-weight:700;}
+.call-btn{width:100%;border:none;border-radius:12px;padding:18px;font-size:18px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;letter-spacing:0.04em;background:linear-gradient(135deg,#15803d,#22c55e);color:#fff;box-shadow:0 4px 20px #22c55e45;min-height:60px;}
+.call-btn:active{transform:scale(0.97);opacity:0.9;}
+.log-btn{width:100%;margin-top:8px;background:#0f2040;color:#38bdf8;border:1.5px solid #1a4a7a;border-radius:10px;padding:14px;font-size:14px;font-weight:700;min-height:48px;}
+.log-btn:active{background:#1a3060;}
 .tabs{display:flex;background:#0a1628;border-bottom:1px solid #0f2040;flex-shrink:0;}
-.tab-btn{flex:1;padding:13px 8px;background:transparent;color:#475569;border:none;border-bottom:2px solid transparent;font-size:13px;font-weight:700;}
+.tab-btn{flex:1;padding:14px 8px;background:transparent;color:#475569;border:none;border-bottom:2px solid transparent;font-size:13px;font-weight:700;min-height:48px;}
 .tab-btn.active{background:#0f2040;color:#60a5fa;border-bottom-color:#3b82f6;}
-.tab-body{flex:1;overflow-y:auto;padding:16px;-webkit-overflow-scrolling:touch;}
+.tab-body{flex:1;overflow-y:auto;padding:16px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
 .info-grid{display:grid;grid-template-columns:1fr;gap:10px;}
 @media(min-width:768px){.info-grid{grid-template-columns:1fr 1fr;}}
 .ic{background:#0a1628;border:1px solid #0f2040;border-radius:10px;padding:12px 14px;}
@@ -98,7 +100,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
 .modal-ov{display:none;position:fixed;inset:0;background:#000000bb;z-index:200;flex-direction:column;justify-content:flex-end;align-items:stretch;}
 .modal-ov.open{display:flex;}
 @media(min-width:768px){.modal-ov{justify-content:center;align-items:center;} .modal-box{border-radius:14px!important;width:540px!important;max-width:90vw;} .modal-handle{display:none!important;}}
-.modal-box{background:#0f172a;border:1px solid #1a3a6a;border-radius:20px 20px 0 0;padding:24px 20px 36px;max-height:92vh;overflow-y:auto;width:100%;box-sizing:border-box;}
+.modal-box{background:#0f172a;border:1px solid #1a3a6a;border-radius:20px 20px 0 0;padding:24px 20px calc(36px + env(safe-area-inset-bottom));max-height:92vh;overflow-y:auto;width:100%;box-sizing:border-box;-webkit-overflow-scrolling:touch;}
 .modal-handle{width:40px;height:4px;background:#1e3a5f;border-radius:2px;margin:0 auto 18px;}
 .modal-title{color:#e2e8f0;font-size:15px;font-weight:700;margin-bottom:16px;}
 .fg{display:grid;grid-template-columns:1fr;gap:12px;}
@@ -107,25 +109,33 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
 .ff.full{grid-column:1/-1;}
 .fl{color:#475569;font-size:11px;letter-spacing:0.07em;}
 .rg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px;}
-.rb{background:#0f2040;color:#94a3b8;border:1.5px solid #1a3a6a;border-radius:10px;padding:12px 8px;font-size:13px;font-weight:700;min-height:46px;}
+.rb{background:#0f2040;color:#94a3b8;border:1.5px solid #1a3a6a;border-radius:10px;padding:14px 8px;font-size:14px;font-weight:700;min-height:48px;}
+.rb:active{opacity:0.8;}
 .rb.sel{background:#1d4ed8;color:#fff;border-color:#3b82f6;}
 .sg{display:flex;flex-wrap:wrap;gap:6px;}
-.sb{background:#0f2040;color:#475569;border:1.5px solid #1a3a6a;border-radius:8px;padding:9px 12px;font-size:12px;font-weight:700;min-height:38px;}
+.sb{background:#0f2040;color:#475569;border:1.5px solid #1a3a6a;border-radius:8px;padding:10px 12px;font-size:13px;font-weight:700;min-height:40px;}
+.sb:active{opacity:0.8;}
 .ma{display:flex;gap:10px;margin-top:18px;}
 
-.btn{border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:700;}
+.btn{border:none;border-radius:8px;padding:12px 16px;font-size:14px;font-weight:700;min-height:44px;}
+.btn:active{opacity:0.85;}
 .btn-p{background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:#fff;}
 .btn-s{background:linear-gradient(135deg,#15803d,#22c55e);color:#fff;}
-.btn-csv{background:#1d4ed8;color:#fff;padding:8px 14px;font-size:13px;border:none;border-radius:8px;font-weight:700;}
-.btn-add{background:#15803d;color:#fff;padding:8px 14px;font-size:13px;border:none;border-radius:8px;font-weight:700;}
+.btn-csv{background:#1d4ed8;color:#fff;padding:8px 14px;font-size:13px;border:none;border-radius:8px;font-weight:700;min-height:36px;}
+.btn-add{background:#15803d;color:#fff;padding:8px 14px;font-size:13px;border:none;border-radius:8px;font-weight:700;min-height:36px;}
 .btn-2{background:#1e293b;color:#94a3b8;border:1px solid #334155;}
-.btn-e{background:#1e293b;color:#94a3b8;border:1px solid #334155;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:700;}
-.btn-d{background:#2d0a0a;color:#f87171;border:1px solid #7f1d1d;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:700;}
-.btn-back{background:#0f2040;color:#94a3b8;border:1px solid #1a3a6a;padding:8px 14px;font-size:13px;border-radius:8px;font-weight:700;margin-bottom:12px;}
-.btn-full{width:100%;padding:13px;font-size:14px;}
+.btn-e{background:#1e293b;color:#94a3b8;border:1px solid #334155;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:700;min-height:36px;}
+.btn-d{background:#2d0a0a;color:#f87171;border:1px solid #7f1d1d;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:700;min-height:36px;}
+.btn-back{background:#0f2040;color:#94a3b8;border:1px solid #1a3a6a;padding:10px 14px;font-size:14px;border-radius:8px;font-weight:700;margin-bottom:12px;min-height:44px;}
+.btn-back:active{background:#1a3060;}
+.btn-full{width:100%;padding:14px;font-size:15px;}
+.btn-gear{background:transparent;border:1px solid #1a3a6a;border-radius:8px;padding:6px 10px;font-size:16px;min-height:36px;min-width:36px;}
+
+.loading-bar{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#3b82f6,#22c55e);z-index:999;transition:width 0.3s;border-radius:0 2px 2px 0;}
 </style>
 </head>
 <body>
+<div class="loading-bar" id="loadbar" style="width:0;display:none"></div>
 <div id="app">
   <div id="main">
     <div id="list-panel">
@@ -133,9 +143,11 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
         <div class="header-top">
           <div class="logo"><span>MT</span>興業<small>テレアポ</small></div>
           <div class="header-btns">
-            <button class="btn-csv" onclick="document.getElementById('csv-input').click()">📥 CSV</button>
+            <span class="sync-indicator" id="sync-ind"></span>
+            <button class="btn-csv" onclick="document.getElementById('csv-input').click()">CSV</button>
             <input type="file" id="csv-input" accept=".csv" style="display:none" onchange="handleCSV(this)"/>
-            <button class="btn-add" onclick="openAdd()">＋ 追加</button>
+            <button class="btn-add" onclick="openAdd()">+ 追加</button>
+            <button class="btn-gear" onclick="openM('sm')" title="同期設定">⚙</button>
           </div>
         </div>
         <div class="stats">
@@ -144,8 +156,8 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
           <div class="stat-card"><div class="stat-num" id="sb2" style="color:#38bdf8">0</div><div class="stat-label">折り返し</div></div>
         </div>
         <div class="search-wrap">
-          <input type="text" id="qi" placeholder="🔍 会社名 / 住所で検索..." oninput="renderList()" style="padding-right:60px;font-size:13px;"/>
-          <button class="filter-toggle" id="ftb" onclick="toggleF()">絞込 ▾</button>
+          <input type="text" id="qi" placeholder="会社名 / 住所で検索..." oninput="renderList()" style="padding-right:60px;font-size:14px;"/>
+          <button class="filter-toggle" id="ftb" onclick="toggleF()">絞込</button>
         </div>
         <div class="filters" id="filters">
           <select id="fs" onchange="renderList()">
@@ -165,7 +177,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
     </div>
 
     <div id="detail-panel">
-      <div class="d-ph" id="dph"><div class="phi">📋</div><p>左のリストから業者を選んでください</p></div>
+      <div class="d-ph" id="dph"><div class="phi">📋</div><p>リストから業者を選んでください</p></div>
       <div id="dc" style="display:none;flex-direction:column;height:100%;overflow:hidden;">
         <div class="detail-header">
           <button class="btn-back" id="back-btn" onclick="closeDetail()">← 一覧に戻る</button>
@@ -175,12 +187,12 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
               <div id="db"></div>
             </div>
             <div class="d-btns">
-              <button class="btn-e" onclick="openEdit()">✏️ 編集</button>
-              <button class="btn-d" onclick="delSel()">🗑 削除</button>
+              <button class="btn-e" onclick="openEdit()">編集</button>
+              <button class="btn-d" onclick="delSel()">削除</button>
             </div>
           </div>
           <button class="call-btn" onclick="doCall()">
-            <span style="font-size:22px">📞</span>
+            <span style="font-size:24px">📞</span>
             <span>電話をかける</span>
             <span id="dpd" style="font-size:13px;opacity:0.8"></span>
           </button>
@@ -201,7 +213,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
 <div class="modal-ov" id="fm" onclick="bgClick(event,'fm')">
   <div class="modal-box">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="fmt">＋ 新規業者を追加</div>
+    <div class="modal-title" id="fmt">+ 新規業者を追加</div>
     <div class="fg">
       <div class="ff full"><label class="fl">会社名 *</label><input type="text" id="fc"/></div>
       <div class="ff full"><label class="fl">住所</label><input type="text" id="fa"/></div>
@@ -221,7 +233,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
     </div>
     <div class="ma">
       <button class="btn btn-s btn-full" onclick="saveForm()">保存する</button>
-      <button class="btn btn-2" onclick="closeM('fm')" style="padding:13px 18px">キャンセル</button>
+      <button class="btn btn-2" onclick="closeM('fm')" style="padding:14px 18px">キャンセル</button>
     </div>
   </div>
 </div>
@@ -243,13 +255,41 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
     <div style="margin-bottom:18px"><label class="fl">メモ（任意）</label><textarea rows="3" id="lno" placeholder="担当者の反応など..."></textarea></div>
     <div class="ma">
       <button class="btn btn-p btn-full" onclick="saveLog()">保存する</button>
-      <button class="btn btn-2" onclick="closeM('lm')" style="padding:13px 18px">キャンセル</button>
+      <button class="btn btn-2" onclick="closeM('lm')" style="padding:14px 18px">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<!-- SYNC SETTINGS MODAL -->
+<div class="modal-ov" id="sm" onclick="bgClick(event,'sm')">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⚙ データ同期設定</div>
+    <div style="margin-bottom:16px;color:#94a3b8;font-size:13px;line-height:1.7;">
+      PCとiPhoneでデータを共有するには、GitHubトークンを入力してください。<br/>
+      PCでは自動設定済みの場合があります。
+    </div>
+    <div class="ff" style="margin-bottom:12px">
+      <label class="fl">GitHubトークン</label>
+      <input type="text" id="gh-token" placeholder="ghp_xxxx または gho_xxxx" style="font-size:14px;"/>
+    </div>
+    <div style="margin-bottom:16px">
+      <div id="sync-status" style="color:#475569;font-size:12px;"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="btn btn-p btn-full" onclick="saveSyncSettings()">保存してデータ同期</button>
+      <button class="btn btn-full" onclick="manualSync()" style="background:#0f2040;color:#38bdf8;border:1px solid #1a4a7a;">手動で同期を実行</button>
+      <button class="btn btn-2 btn-full" onclick="closeM('sm')">閉じる</button>
     </div>
   </div>
 </div>
 
 <script>
 const SK='mt-teleapo-v5';
+const GH_REPO='mtkougyou2021-sudo/mt-teleapo';
+const GH_FILE='data.json';
+const GH_TOKEN_KEY='mt-teleapo-gh-token';
+
 const SL=[
   {v:'未対応',c:'#94a3b8',bg:'#1e293b',i:'○'},
   {v:'電話中',c:'#fbbf24',bg:'#2d1f00',i:'📞'},
@@ -262,16 +302,158 @@ const SL=[
 const CR=['不在','担当者不在','折り返し約束','アポ取得','お断り','検討中','再架電'];
 const FM={companyName:['会社名','会社','company','企業名','業者名'],address:['住所','address','所在地'],industry:['業種','業態','industry'],phone:['電話','tel','phone','電話番号'],contactName:['担当者','担当','contact','氏名','名前'],contactTitle:['役職','肩書','title'],memo:['備考','メモ','note','memo']};
 
-let cos=[],selId=null,fMode='add',lRes='',lStat='';
+let cos=[],selId=null,fMode='add',lRes='',lStat='',ghSha=null;
 
 const nc=()=>({id:`${Date.now()}-${Math.random()}`,companyName:'',address:'',industry:'',phone:'',contactName:'',contactTitle:'',memo:'',status:'未対応',nextAppointment:'',callHistory:[],createdAt:new Date().toISOString()});
-const load=()=>{try{const d=localStorage.getItem(SK);return d?JSON.parse(d):[];}catch{return[];}};
-const save=()=>{try{localStorage.setItem(SK,JSON.stringify(cos));}catch{}};
+const loadLocal=()=>{try{const d=localStorage.getItem(SK);return d?JSON.parse(d):[];}catch{return[];}};
+const saveLocal=()=>{try{localStorage.setItem(SK,JSON.stringify(cos));}catch{}};
 const getSel=()=>cos.find(c=>c.id===selId)||null;
 const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const fdt=s=>{if(!s)return'';try{return new Date(s).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});}catch{return s;}};
 const fdtf=s=>{if(!s)return'';try{return new Date(s).toLocaleString('ja-JP',{year:'numeric',month:'narrow',day:'numeric',hour:'2-digit',minute:'2-digit'});}catch{return s;}};
+const getToken=()=>localStorage.getItem(GH_TOKEN_KEY)||'';
 
+// --- GitHub Sync ---
+function showLoading(show){
+  const bar=document.getElementById('loadbar');
+  if(show){bar.style.display='block';bar.style.width='30%';setTimeout(()=>bar.style.width='70%',200);}
+  else{bar.style.width='100%';setTimeout(()=>{bar.style.display='none';bar.style.width='0';},400);}
+}
+
+function updateSyncIndicator(status,msg){
+  const el=document.getElementById('sync-ind');
+  if(status==='ok'){el.textContent='同期済';el.style.background='#052e16';el.style.color='#4ade80';}
+  else if(status==='error'){el.textContent='未同期';el.style.background='#2d0a0a';el.style.color='#f87171';}
+  else if(status==='syncing'){el.textContent='同期中...';el.style.background='#0c2330';el.style.color='#38bdf8';}
+  else{el.textContent='';el.style.background='transparent';}
+}
+
+function utf8ToBase64(str){
+  const bytes=new TextEncoder().encode(str);
+  let binary='';
+  for(let i=0;i<bytes.length;i++)binary+=String.fromCharCode(bytes[i]);
+  return btoa(binary);
+}
+function base64ToUtf8(b64){
+  const binary=atob(b64);
+  const bytes=new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+
+async function ghRead(){
+  const token=getToken();
+  const headers={};
+  if(token)headers['Authorization']='token '+token;
+  headers['Accept']='application/vnd.github.v3+json';
+  try{
+    const res=await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`,{headers});
+    if(!res.ok)return null;
+    const data=await res.json();
+    ghSha=data.sha;
+    return JSON.parse(base64ToUtf8(data.content));
+  }catch{return null;}
+}
+
+async function ghWrite(data){
+  const token=getToken();
+  if(!token)return false;
+  try{
+    // Get current SHA
+    const headers={'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json'};
+    const getRes=await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`,{headers});
+    let sha=null;
+    if(getRes.ok){const existing=await getRes.json();sha=existing.sha;}
+
+    const body={message:'sync data',content:utf8ToBase64(JSON.stringify(data,null,2))};
+    if(sha)body.sha=sha;
+
+    const putRes=await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`,{
+      method:'PUT',headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify(body)
+    });
+    if(putRes.ok){
+      const result=await putRes.json();
+      ghSha=result.content.sha;
+      return true;
+    }
+    return false;
+  }catch{return false;}
+}
+
+async function syncFromGitHub(){
+  showLoading(true);
+  updateSyncIndicator('syncing');
+  const remote=await ghRead();
+  if(remote&&Array.isArray(remote)){
+    // Merge: remote data is the source of truth, but keep local-only entries
+    const remoteIds=new Set(remote.map(c=>c.id));
+    const localOnly=cos.filter(c=>!remoteIds.has(c.id));
+    cos=[...remote,...localOnly];
+    saveLocal();
+    rAll();
+    updateSyncIndicator('ok');
+    showLoading(false);
+    return true;
+  }else{
+    // No remote data, push local to remote
+    if(cos.length>0&&getToken()){
+      const ok=await ghWrite(cos);
+      updateSyncIndicator(ok?'ok':'error');
+    }else{
+      updateSyncIndicator(getToken()?'ok':'');
+    }
+    showLoading(false);
+    return false;
+  }
+}
+
+async function syncToGitHub(){
+  if(!getToken())return;
+  updateSyncIndicator('syncing');
+  const ok=await ghWrite(cos);
+  updateSyncIndicator(ok?'ok':'error');
+}
+
+// Debounced save: save local immediately, sync to GitHub with delay
+let syncTimer=null;
+function save(){
+  saveLocal();
+  if(syncTimer)clearTimeout(syncTimer);
+  syncTimer=setTimeout(()=>syncToGitHub(),2000);
+}
+
+async function manualSync(){
+  const ok=await syncFromGitHub();
+  if(ok){
+    document.getElementById('sync-status').textContent='同期完了 ('+cos.length+'件)';
+    document.getElementById('sync-status').style.color='#4ade80';
+  }else if(cos.length>0&&getToken()){
+    await syncToGitHub();
+    document.getElementById('sync-status').textContent='アップロード完了 ('+cos.length+'件)';
+    document.getElementById('sync-status').style.color='#4ade80';
+  }else{
+    document.getElementById('sync-status').textContent='同期するデータがありません';
+    document.getElementById('sync-status').style.color='#f87171';
+  }
+  rAll();
+}
+
+function saveSyncSettings(){
+  const token=document.getElementById('gh-token').value.trim();
+  if(token){
+    localStorage.setItem(GH_TOKEN_KEY,token);
+    document.getElementById('sync-status').textContent='トークンを保存しました。同期中...';
+    document.getElementById('sync-status').style.color='#38bdf8';
+    manualSync();
+  }else{
+    localStorage.removeItem(GH_TOKEN_KEY);
+    document.getElementById('sync-status').textContent='トークンを削除しました';
+    document.getElementById('sync-status').style.color='#475569';
+    updateSyncIndicator('');
+  }
+}
+
+// --- UI ---
 function badge(v,big){
   const s=SL.find(x=>x.v===v)||SL[0];
   return `<span class="badge${big?' big':''}" style="color:${s.c};background:${s.bg};border-color:${s.c}55">${s.i} ${v}</span>`;
@@ -300,9 +482,9 @@ function handleCSV(inp){
       lst.push(c);
     });
     cos=[...cos,...lst];save();rAll();
-    let msg='✅ '+lst.length+'件インポートしました';
-    if(noPhone.length)msg+='\n\n⚠ 電話番号なし（除外: '+noPhone.length+'件）:\n'+noPhone.slice(0,10).join('\n')+(noPhone.length>10?'\n…他'+(noPhone.length-10)+'件':'');
-    if(freeDial.length)msg+='\n\n⚠ フリーダイヤル（除外: '+freeDial.length+'件）:\n'+freeDial.slice(0,10).join('\n')+(freeDial.length>10?'\n…他'+(freeDial.length-10)+'件':'')+'\n\n※ フリーダイヤルの企業は通常の電話番号を調べて手動で追加してください';
+    let msg=''+lst.length+'件インポートしました';
+    if(noPhone.length)msg+='\n\n電話番号なし（除外: '+noPhone.length+'件）';
+    if(freeDial.length)msg+='\n\nフリーダイヤル（除外: '+freeDial.length+'件）';
     alert(msg);
   };
   r.readAsText(file,'UTF-8');inp.value='';
@@ -324,18 +506,18 @@ function renderList(){
   document.getElementById('lf').textContent=f.length+' / '+cos.length+' 件';
   const bd=document.getElementById('list-body');
   if(!f.length){
-    bd.innerHTML=cos.length?'<div class="list-empty"><p>条件に一致する業者がいません</p></div>':'<div class="list-empty"><div class="ei">📋</div><p>まだリストがありません</p><small>「📥 CSV」からインポートまたは「＋ 追加」から登録</small></div>';
+    bd.innerHTML=cos.length?'<div class="list-empty"><p>条件に一致する業者がいません</p></div>':'<div class="list-empty"><div class="ei">📋</div><p>まだリストがありません</p><small>CSVからインポートまたは＋追加から登録</small></div>';
     return;
   }
   bd.innerHTML=f.map(c=>{
     const s=SL.find(x=>x.v===c.status)||SL[0];
     const isSel=c.id===selId;
-    const meta=[c.address?`<span>📍 ${esc(c.address)}</span>`:'',c.industry?`<span class="ind">🏗 ${esc(c.industry)}</span>`:'',c.contactName?`<span>👤 ${esc(c.contactName)}</span>`:''].filter(Boolean).join('');
+    const meta=[c.address?`<span>📍 ${esc(c.address)}</span>`:'',c.industry?`<span class="ind">${esc(c.industry)}</span>`:'',c.contactName?`<span>👤 ${esc(c.contactName)}</span>`:''].filter(Boolean).join('');
     return `<div class="li${isSel?' active':''}" style="border-left-color:${isSel?s.c:s.c+'55'}" onclick="selCo('${c.id}')">
       <div class="li-top"><div class="li-name">${esc(c.companyName)}</div>${badge(c.status,false)}</div>
       ${meta?`<div class="li-meta">${meta}</div>`:''}
       ${c.nextAppointment?`<div class="li-appt">📅 ${fdt(c.nextAppointment)}</div>`:''}
-      ${c.callHistory?.length?`<div class="li-hist">架電 ${c.callHistory.length}回 · 最終: ${c.callHistory[0]?.result}</div>`:''}
+      ${c.callHistory?.length?`<div class="li-hist">架電 ${c.callHistory.length}回</div>`:''}
     </div>`;
   }).join('');
 }
@@ -349,15 +531,13 @@ function renderDetail(){
   document.getElementById('dn').textContent=c.companyName;
   document.getElementById('db').innerHTML=badge(c.status,true);
   document.getElementById('dpd').textContent=c.phone||'';
-  // info tab
   const rows=[{l:'住所',v:c.address,i:'📍',full:true},{l:'業種',v:c.industry,i:'🏗'},{l:'電話番号',v:c.phone,i:'📱'},{l:'担当者名',v:c.contactName,i:'👤'},{l:'役職',v:c.contactTitle,i:'💼'},{l:'次回アポ',v:c.nextAppointment?fdtf(c.nextAppointment):null,i:'📅'}];
   let h='<div class="info-grid">';
   rows.forEach(r=>h+=`<div class="ic${r.full?' full':''}"><div class="ic-label">${r.l}</div><div class="ic-val${r.v?'':' empty'}">${r.v?r.i+' '+esc(r.v):'—'}</div></div>`);
   if(c.memo)h+=`<div class="ic full"><div class="ic-label">メモ</div><div style="color:#94a3b8;font-size:13px;white-space:pre-wrap;line-height:1.7">${esc(c.memo)}</div></div>`;
   h+='</div>';
   document.getElementById('t0').innerHTML=h;
-  // history tab
-  document.getElementById('tb1').textContent=`📞 履歴 (${c.callHistory?.length||0}件)`;
+  document.getElementById('tb1').textContent='📞 履歴 ('+(c.callHistory?.length||0)+'件)';
   document.getElementById('t1').innerHTML=!c.callHistory?.length?'<div style="text-align:center;padding:40px;color:#334155;"><div style="font-size:32px;margin-bottom:8px">📞</div>まだ架電記録がありません</div>':c.callHistory.map(lg=>`<div class="hc"><div class="hc-top"><span class="hc-date">${lg.date}</span><span class="hc-result">${lg.result}</span></div>${lg.note?`<div style="color:#94a3b8;font-size:13px;line-height:1.6">${esc(lg.note)}</div>`:''}${lg.nextDate?`<div style="color:#f59e0b;font-size:12px;margin-top:6px">📅 次回: ${fdt(lg.nextDate)}</div>`:''}</div>`).join('');
 }
 
@@ -371,13 +551,22 @@ function closeDetail(){
   selId=null;renderList();
 }
 function delSel(){if(!confirm('この業者を削除しますか？'))return;cos=cos.filter(c=>c.id!==selId);selId=null;save();closeDetail();rAll();}
-function doCall(){const c=getSel();if(!c||!c.phone){alert('電話番号が登録されていません');return;}window.location.href='tel:'+c.phone.replace(/[-\s]/g,'');setTimeout(()=>openLog(),800);}
+function doCall(){
+  const c=getSel();
+  if(!c||!c.phone){alert('電話番号が登録されていません');return;}
+  const tel='tel:'+c.phone.replace(/[-\s]/g,'');
+  // Use link click for better iOS compatibility
+  const a=document.createElement('a');
+  a.href=tel;
+  a.click();
+  setTimeout(()=>openLog(),1000);
+}
 function swTab(n){
   [0,1].forEach(i=>{document.getElementById('tb'+i).classList.toggle('active',i===n);document.getElementById('t'+i).style.display=i===n?'block':'none';});
 }
 
-function openAdd(){fMode='add';document.getElementById('fmt').textContent='＋ 新規業者を追加';['fc','fa','fp','fct','ftl','fmo','fap'].forEach(id=>document.getElementById(id).value='');document.getElementById('fin').value='';openM('fm');}
-function openEdit(){const c=getSel();if(!c)return;fMode='edit';document.getElementById('fmt').textContent='✏️ 情報を編集';document.getElementById('fc').value=c.companyName||'';document.getElementById('fa').value=c.address||'';document.getElementById('fp').value=c.phone||'';document.getElementById('fct').value=c.contactName||'';document.getElementById('ftl').value=c.contactTitle||'';document.getElementById('fin').value=c.industry||'';document.getElementById('fap').value=c.nextAppointment||'';document.getElementById('fmo').value=c.memo||'';openM('fm');}
+function openAdd(){fMode='add';document.getElementById('fmt').textContent='+ 新規業者を追加';['fc','fa','fp','fct','ftl','fmo','fap'].forEach(id=>document.getElementById(id).value='');document.getElementById('fin').value='';openM('fm');}
+function openEdit(){const c=getSel();if(!c)return;fMode='edit';document.getElementById('fmt').textContent='情報を編集';document.getElementById('fc').value=c.companyName||'';document.getElementById('fa').value=c.address||'';document.getElementById('fp').value=c.phone||'';document.getElementById('fct').value=c.contactName||'';document.getElementById('ftl').value=c.contactTitle||'';document.getElementById('fin').value=c.industry||'';document.getElementById('fap').value=c.nextAppointment||'';document.getElementById('fmo').value=c.memo||'';openM('fm');}
 function saveForm(){
   const name=document.getElementById('fc').value.trim();if(!name){alert('会社名は必須です');return;}
   if(fMode==='add'){const c=nc();c.companyName=name;c.address=document.getElementById('fa').value;c.phone=document.getElementById('fp').value;c.contactName=document.getElementById('fct').value;c.contactTitle=document.getElementById('ftl').value;c.industry=document.getElementById('fin').value;c.nextAppointment=document.getElementById('fap').value;c.memo=document.getElementById('fmo').value;cos.push(c);selId=c.id;}
@@ -391,12 +580,21 @@ function openLog(){
   document.getElementById('lmt').textContent='📞 架電記録 — '+c.companyName;
   document.getElementById('lap').value=c.nextAppointment||'';
   document.getElementById('lno').value='';
-  document.getElementById('rb').innerHTML=CR.map(r=>`<button class="rb" id="rb${r}" onclick="selRes('${r}')">${r}</button>`).join('');
-  document.getElementById('sbg').innerHTML=SL.map(s=>`<button class="sb" id="sb${s.v}" onclick="selStat('${s.v}')" style="background:${lStat===s.v?s.bg:'#0f2040'};color:${lStat===s.v?s.c:'#475569'};border-color:${lStat===s.v?s.c:'#1a3a6a'}">${s.v}</button>`).join('');
+  document.getElementById('rb').innerHTML=CR.map(r=>`<button class="rb" onclick="selRes('${r}')">${r}</button>`).join('');
+  document.getElementById('sbg').innerHTML=SL.map(s=>`<button class="sb" onclick="selStat('${s.v}')" style="background:${lStat===s.v?s.bg:'#0f2040'};color:${lStat===s.v?s.c:'#475569'};border-color:${lStat===s.v?s.c:'#1a3a6a'}">${s.v}</button>`).join('');
   openM('lm');
 }
-function selRes(r){lRes=r;CR.forEach(x=>{const b=document.getElementById('rb'+x);if(b)b.className='rb'+(x===r?' sel':'');});}
-function selStat(v){lStat=v;SL.forEach(s=>{const b=document.getElementById('sb'+s.v);if(b){b.style.background=s.v===v?s.bg:'#0f2040';b.style.color=s.v===v?s.c:'#475569';b.style.borderColor=s.v===v?s.c:'#1a3a6a';}});}
+function selRes(r){
+  lRes=r;
+  document.querySelectorAll('#rb .rb').forEach(b=>b.className='rb'+(b.textContent===r?' sel':''));
+}
+function selStat(v){
+  lStat=v;
+  document.querySelectorAll('#sbg .sb').forEach(b=>{
+    const s=SL.find(x=>x.v===b.textContent);
+    if(s){b.style.background=b.textContent===v?s.bg:'#0f2040';b.style.color=b.textContent===v?s.c:'#475569';b.style.borderColor=b.textContent===v?s.c:'#1a3a6a';}
+  });
+}
 function saveLog(){
   if(!lRes){alert('架電結果を選んでください');return;}
   const c=getSel();if(!c)return;
@@ -405,13 +603,19 @@ function saveLog(){
   save();closeM('lm');rAll();renderDetail();
 }
 
-function openM(id){document.getElementById(id).classList.add('open');}
+function openM(id){
+  document.getElementById(id).classList.add('open');
+  if(id==='sm'){document.getElementById('gh-token').value=getToken();document.getElementById('sync-status').textContent='';}
+}
 function closeM(id){document.getElementById(id).classList.remove('open');}
 function bgClick(e,id){if(e.target===e.currentTarget)closeM(id);}
 function toggleF(){const f=document.getElementById('filters');const b=document.getElementById('ftb');const o=f.classList.toggle('open');b.classList.toggle('active',o);}
 window.addEventListener('resize',()=>{if(window.innerWidth>=768){document.getElementById('list-panel').style.display='';document.getElementById('detail-panel').style.display='';}});
 
-cos=load();rAll();
+// --- Init ---
+cos=loadLocal();rAll();
+// Auto-sync on load
+syncFromGitHub().then(()=>rAll());
 
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 </script>

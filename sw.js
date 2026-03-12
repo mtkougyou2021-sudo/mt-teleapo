@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mt-teleapo-v1';
+const CACHE_NAME = 'mt-teleapo-v2';
 const ASSETS = [
   './',
   './MT興業_テレアポ.html',
@@ -22,7 +22,18 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  const url = new URL(e.request.url);
+  // Always fetch from network for GitHub API calls
+  if (url.hostname === 'api.github.com') {
+    e.respondWith(fetch(e.request));
+    return;
+  }
+  // Network first, fall back to cache for app files
   e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request))
+    fetch(e.request).then(res => {
+      const clone = res.clone();
+      caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+      return res;
+    }).catch(() => caches.match(e.request))
   );
 });
