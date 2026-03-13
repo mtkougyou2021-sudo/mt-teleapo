@@ -506,6 +506,24 @@ async function syncToGitHub(){
   if(!getToken()||isSaving)return;
   isSaving=true;
   updateSyncIndicator('syncing');
+  // Safety: check remote before writing — never overwrite richer data
+  const remote=await ghRead();
+  if(remote){
+    const rd=unpackData(remote);
+    const rc=rd.contacts||[];
+    const remoteH=totalHist(rc);
+    const localH=totalHist(cos);
+    const remoteC=countChanged(rc);
+    const localC=countChanged(cos);
+    if(remoteH>localH||remoteC>localC){
+      // Remote has more data, merge into local instead of overwriting
+      cos=mergeData(cos,rc);
+      saveLocal();rAll();
+      isSaving=false;
+      updateSyncIndicator('ok');
+      return true;
+    }
+  }
   const ok=await ghWrite(packData());
   updateSyncIndicator(ok?'ok':'error');
   isSaving=false;
@@ -833,7 +851,7 @@ document.addEventListener('visibilitychange',()=>{
 });
 window.addEventListener('pagehide',()=>{saveLocal();});
 
-const APP_VER='8';
+const APP_VER='9';
 (async function(){
   if(!('serviceWorker' in navigator))return;
   const lastVer=localStorage.getItem('mt-app-ver');

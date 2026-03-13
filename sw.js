@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mt-teleapo-v8';
+const CACHE_NAME = 'mt-teleapo-v9';
 const STATIC_ASSETS = ['./icon-192.png', './icon-512.png', './manifest.json'];
 
 self.addEventListener('install', e => {
