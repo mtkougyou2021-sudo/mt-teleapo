@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mt-teleapo-v5';
+const CACHE_NAME = 'mt-teleapo-v6';
 const ASSETS = [
   './',
   './index.html',
