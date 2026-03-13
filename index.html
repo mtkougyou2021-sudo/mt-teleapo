@@ -262,8 +262,8 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
     <div style="margin-bottom:12px"><label class="fl">担当者名</label><input type="text" id="lcontact" placeholder="対応した担当者名"/></div>
     <div style="margin-bottom:12px"><label class="fl">次回アポ日時</label><input type="datetime-local" id="lap"/></div>
     <div style="margin-bottom:18px">
-      <button type="button" onclick="toggleMemo()" style="background:transparent;border:none;color:#475569;font-size:12px;padding:4px 0;cursor:pointer;" id="memo-toggle">+ メモを追加</button>
-      <div id="memo-wrap" style="display:none;margin-top:6px;"><textarea rows="2" id="lno" placeholder="メモ（任意）" style="font-size:13px;"></textarea></div>
+      <label class="fl">メモ</label>
+      <textarea rows="3" id="lno" placeholder="メモ（任意）" style="font-size:13px;margin-top:6px;"></textarea>
     </div>
     <div class="ma">
       <button class="btn btn-p btn-full" onclick="saveLog()">保存する</button>
@@ -676,8 +676,6 @@ function openLog(){
   document.getElementById('lcontact').value=c.contactName||'';
   document.getElementById('lap').value=c.nextAppointment||'';
   document.getElementById('lno').value='';
-  document.getElementById('memo-wrap').style.display='none';
-  document.getElementById('memo-toggle').textContent='+ メモを追加';
   document.getElementById('rb').innerHTML=CR.map(r=>`<button class="rb" onclick="selRes('${r}')">${r}</button>`).join('');
   document.getElementById('sbg').innerHTML=SL.map(s=>`<button class="sb" onclick="selStat('${s.v}')" style="background:${lStat===s.v?s.bg:'#0f2040'};color:${lStat===s.v?s.c:'#475569'};border-color:${lStat===s.v?s.c:'#1a3a6a'}">${s.v}</button>`).join('');
   openM('lm');
