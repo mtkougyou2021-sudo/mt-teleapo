@@ -460,18 +460,33 @@ function unpackData(data){
   return {contacts:data.contacts||[],statusLabels:data.statusLabels||null,callResults:data.callResults||null};
 }
 
+function totalHist(arr){return arr.reduce((n,c)=>n+(c.callHistory||[]).length,0);}
+function countChanged(arr){return arr.filter(c=>c.status!=='未対応'||(c.callHistory||[]).length>0).length;}
+
 async function syncFromGitHub(){
   showLoading(true);
   updateSyncIndicator('syncing');
   const remote=await ghRead();
   if(remote){
     const rd=unpackData(remote);
-    if(rd.contacts)cos=mergeData(cos,rd.contacts);
+    const rc=rd.contacts||[];
+    const localChanged=countChanged(cos);
+    const remoteChanged=countChanged(rc);
+    const localHist=totalHist(cos);
+    const remoteHist=totalHist(rc);
+    // If remote has more data, prefer remote entirely
+    if(remoteHist>localHist||remoteChanged>localChanged){
+      cos=mergeData(cos,rc);
+    }else if(localHist>remoteHist||localChanged>remoteChanged){
+      cos=mergeData(cos,rc);
+      if(getToken())await ghWrite(packData());
+    }else{
+      cos=mergeData(cos,rc);
+    }
     if(rd.statusLabels&&rd.statusLabels.length){SL=rd.statusLabels;saveSL();}
     if(rd.callResults&&rd.callResults.length){CR=rd.callResults;saveCR();}
     saveLocal();
     rAll();
-    if(getToken())await ghWrite(packData());
     updateSyncIndicator('ok');
     showLoading(false);
     return true;
@@ -818,7 +833,7 @@ document.addEventListener('visibilitychange',()=>{
 });
 window.addEventListener('pagehide',()=>{saveLocal();});
 
-const APP_VER='7';
+const APP_VER='8';
 (async function(){
   if(!('serviceWorker' in navigator))return;
   const lastVer=localStorage.getItem('mt-app-ver');
