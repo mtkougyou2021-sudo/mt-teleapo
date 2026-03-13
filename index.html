@@ -446,45 +446,16 @@ async function ghWrite(data){
   }catch{return false;}
 }
 
-function mergeData(local,remote){
-  // Smart merge: for each entry, keep the one with more call history or more recent update
-  const localMap=new Map(local.map(c=>[c.id,c]));
-  const remoteMap=new Map(remote.map(c=>[c.id,c]));
-  const allIds=new Set([...localMap.keys(),...remoteMap.keys()]);
-  const merged=[];
-  allIds.forEach(id=>{
-    const l=localMap.get(id);
-    const r=remoteMap.get(id);
-    if(!l){merged.push(r);return;}
-    if(!r){merged.push(l);return;}
-    // Both exist: keep the one with more call history, or more recent updatedAt
-    const lHist=(l.callHistory||[]).length;
-    const rHist=(r.callHistory||[]).length;
-    if(lHist!==rHist){merged.push(lHist>rHist?l:r);return;}
-    const lTime=new Date(l.updatedAt||l.createdAt||0).getTime();
-    const rTime=new Date(r.updatedAt||r.createdAt||0).getTime();
-    merged.push(lTime>=rTime?l:r);
-  });
-  return merged;
-}
-
-// data.json is always a plain array for backward compatibility
-function packData(){return cos;}
 function unpackData(data){
   if(Array.isArray(data))return data;
   return data.contacts||[];
 }
 
-function totalHist(arr){return arr.reduce((n,c)=>n+(c.callHistory||[]).length,0);}
-function countChanged(arr){return arr.filter(c=>c.status!=='未対応'||(c.callHistory||[]).length>0).length;}
-
 async function syncConfig(){
-  // Sync SL/CR from config.json
   try{
     const token=getToken();
-    const headers={};
+    const headers={'Accept':'application/vnd.github.v3+json'};
     if(token)headers['Authorization']='token '+token;
-    headers['Accept']='application/vnd.github.v3+json';
     const res=await fetch(`https://api.github.com/repos/${GH_REPO}/contents/config.json`,{headers});
     if(res.ok){
       const d=await res.json();
@@ -496,13 +467,11 @@ async function syncConfig(){
 }
 
 async function saveConfig(){
-  const token=getToken();
-  if(!token)return;
+  const token=getToken();if(!token)return;
   try{
     const headers={'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json'};
-    const getRes=await fetch(`https://api.github.com/repos/${GH_REPO}/contents/config.json`,{headers});
-    let sha=null;
-    if(getRes.ok){sha=(await getRes.json()).sha;}
+    const r=await fetch(`https://api.github.com/repos/${GH_REPO}/contents/config.json`,{headers});
+    let sha=null;if(r.ok){sha=(await r.json()).sha;}
     const body={message:'sync config',content:utf8ToBase64(JSON.stringify({statusLabels:SL,callResults:CR},null,2))};
     if(sha)body.sha=sha;
     await fetch(`https://api.github.com/repos/${GH_REPO}/contents/config.json`,{
@@ -511,66 +480,39 @@ async function saveConfig(){
   }catch{}
 }
 
+// GitHub is the single source of truth
 async function syncFromGitHub(){
   showLoading(true);
   updateSyncIndicator('syncing');
-  const remote=await ghRead();
-  if(remote){
-    const rc=unpackData(remote);
-    const localChanged=countChanged(cos);
-    const remoteChanged=countChanged(rc);
-    const localHist=totalHist(cos);
-    const remoteHist=totalHist(rc);
-    cos=mergeData(cos,rc);
-    // Only write back if local has more data
-    if(localHist>remoteHist||localChanged>remoteChanged){
-      if(getToken())await ghWrite(packData());
+  try{
+    const remote=await ghRead();
+    if(remote){
+      // Always use GitHub data as the truth
+      cos=unpackData(remote);
+      await syncConfig();
+      saveLocal();
+      rAll();
+      updateSyncIndicator('ok');
+      showLoading(false);
+      return true;
     }
-    await syncConfig();
-    saveLocal();
-    rAll();
-    updateSyncIndicator('ok');
-    showLoading(false);
-    return true;
-  }else{
-    if(cos.length>0&&getToken()){
-      const ok=await ghWrite(packData());
-      updateSyncIndicator(ok?'ok':'error');
-    }else{
-      updateSyncIndicator(getToken()?'ok':'');
-    }
-    showLoading(false);
-    return false;
-  }
+  }catch{}
+  updateSyncIndicator(getToken()?'ok':'');
+  showLoading(false);
+  return false;
 }
 
 async function syncToGitHub(){
   if(!getToken()||isSaving)return;
   isSaving=true;
   updateSyncIndicator('syncing');
-  // Safety: check remote before writing — never overwrite richer data
-  const remote=await ghRead();
-  if(remote){
-    const rc=unpackData(remote);
-    const remoteH=totalHist(rc);
-    const localH=totalHist(cos);
-    const remoteC=countChanged(rc);
-    const localC=countChanged(cos);
-    if(remoteH>localH||remoteC>localC){
-      cos=mergeData(cos,rc);
-      saveLocal();rAll();
-      isSaving=false;
-      updateSyncIndicator('ok');
-      return true;
-    }
-  }
-  const ok=await ghWrite(packData());
+  const ok=await ghWrite(cos);
   updateSyncIndicator(ok?'ok':'error');
   isSaving=false;
   return ok;
 }
 
-// Save: local immediately + GitHub sync immediately (await)
+// Save: local + GitHub
 async function save(){
   saveLocal();
   updateSyncIndicator('syncing');
