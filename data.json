@@ -82,10 +82,22 @@
     "contactName": "",
     "contactTitle": "",
     "memo": "",
-    "status": "未対応",
+    "status": "お断り",
     "nextAppointment": "",
-    "callHistory": [],
-    "createdAt": "2026-03-12T06:40:27.828Z"
+    "callHistory": [
+      {
+        "id": 1773388300528,
+        "date": "2026/3/13 16:51:40",
+        "result": "今は募集していない",
+        "contact": "",
+        "note": "",
+        "nextDate": "",
+        "dmSent": false,
+        "dmDate": null
+      }
+    ],
+    "createdAt": "2026-03-12T06:40:27.828Z",
+    "updatedAt": "2026-03-13T07:51:40.528Z"
   },
   {
     "id": "1773297627829-0.43702623057824586",
