@@ -108,9 +108,20 @@
     "contactName": "",
     "contactTitle": "",
     "memo": "",
-    "status": "お断り",
+    "status": "既存顧客",
     "nextAppointment": "",
     "callHistory": [
+      {
+        "id": 1773391328295,
+        "date": "2026/3/13 17:42:08",
+        "result": "既存顧客",
+        "status": "既存顧客",
+        "contact": "",
+        "note": "",
+        "nextDate": "",
+        "dmSent": false,
+        "dmDate": null
+      },
       {
         "id": 1773391292579,
         "date": "2026/3/13 17:41:32",
@@ -135,7 +146,7 @@
       }
     ],
     "createdAt": "2026-03-12T06:40:27.829Z",
-    "updatedAt": "2026-03-13T08:41:32.579Z"
+    "updatedAt": "2026-03-13T08:42:08.295Z"
   },
   {
     "id": "1773297627829-0.6439983629635411",
