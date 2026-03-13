@@ -637,7 +637,7 @@ function renderDetail(){
   h+='</div>';
   document.getElementById('t0').innerHTML=h;
   document.getElementById('tb1').textContent='📞 履歴 ('+(c.callHistory?.length||0)+'件)';
-  document.getElementById('t1').innerHTML=!c.callHistory?.length?'<div style="text-align:center;padding:40px;color:#334155;"><div style="font-size:32px;margin-bottom:8px">📞</div>まだ架電記録がありません</div>':c.callHistory.map(lg=>`<div class="hc"><div class="hc-top"><span class="hc-date">${lg.date}</span><span class="hc-result">${lg.result}</span></div>${lg.contact?`<div style="color:#60a5fa;font-size:12px;margin-bottom:4px;">👤 ${esc(lg.contact)}</div>`:''}${lg.dmSent?`<div style="color:#4ade80;font-size:12px;margin-bottom:4px;">✅ DM送信済み（${lg.dmDate?fdt(lg.dmDate):''}）</div>`:''}${lg.note?`<div style="color:#94a3b8;font-size:13px;line-height:1.6">${esc(lg.note)}</div>`:''}${lg.nextDate?`<div style="color:#f59e0b;font-size:12px;margin-top:6px">📅 次回: ${fdt(lg.nextDate)}</div>`:''}</div>`).join('');
+  document.getElementById('t1').innerHTML=!c.callHistory?.length?'<div style="text-align:center;padding:40px;color:#334155;"><div style="font-size:32px;margin-bottom:8px">📞</div>まだ架電記録がありません</div>':c.callHistory.map(lg=>`<div class="hc"><div class="hc-top"><span class="hc-date">${lg.date}</span><span class="hc-result" style="font-size:13px;">${lg.result}</span></div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;">${lg.status?badge(lg.status,false):''}${lg.contact?`<span style="color:#60a5fa;font-size:12px;">👤 ${esc(lg.contact)}</span>`:''}</div>${lg.dmSent?`<div style="color:#4ade80;font-size:12px;margin-bottom:4px;">✅ DM送信済み（${lg.dmDate?fdt(lg.dmDate):''}）</div>`:''}${lg.note?`<div style="color:#94a3b8;font-size:13px;line-height:1.6">${esc(lg.note)}</div>`:''}${lg.nextDate?`<div style="color:#f59e0b;font-size:12px;margin-top:6px">📅 次回: ${fdt(lg.nextDate)}</div>`:''}</div>`).join('');
 }
 
 function selCo(id){
@@ -722,7 +722,7 @@ async function saveLog(){
   const c=getSel();if(!c)return;
   const contact=document.getElementById('lcontact').value.trim();
   const dmChecked=document.getElementById('ldm').checked;
-  const log={id:Date.now(),date:new Date().toLocaleString('ja-JP'),result:lRes,contact:contact,note:document.getElementById('lno').value,nextDate:document.getElementById('lap').value,dmSent:dmChecked,dmDate:dmChecked?new Date().toISOString():null};
+  const log={id:Date.now(),date:new Date().toLocaleString('ja-JP'),result:lRes,status:lStat,contact:contact,note:document.getElementById('lno').value,nextDate:document.getElementById('lap').value,dmSent:dmChecked,dmDate:dmChecked?new Date().toISOString():null};
   c.callHistory=[log,...(c.callHistory||[])];c.status=lStat;
   if(dmChecked)c.dmSentDate=new Date().toISOString();
   if(contact)c.contactName=contact;
