@@ -1,13 +1,9 @@
-const CACHE_NAME = 'mt-teleapo-v6';
-const ASSETS = [
-  './',
-  './index.html',
-  './manifest.json'
-];
+const CACHE_NAME = 'mt-teleapo-v7';
+const STATIC_ASSETS = ['./icon-192.png', './icon-512.png', './manifest.json'];
 
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_ASSETS))
   );
   self.skipWaiting();
 });
@@ -23,12 +19,19 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
-  // Always fetch from network for GitHub API calls
+  // GitHub API: always network
   if (url.hostname === 'api.github.com') {
     e.respondWith(fetch(e.request));
     return;
   }
-  // Network first, fall back to cache for app files
+  // HTML pages (index.html, /): always network, no cache
+  if (e.request.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname.endsWith('/')) {
+    e.respondWith(
+      fetch(e.request).catch(() => caches.match(e.request))
+    );
+    return;
+  }
+  // Static assets: network first, cache fallback
   e.respondWith(
     fetch(e.request).then(res => {
       const clone = res.clone();

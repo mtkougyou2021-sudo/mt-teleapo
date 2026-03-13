@@ -818,17 +818,31 @@ document.addEventListener('visibilitychange',()=>{
 });
 window.addEventListener('pagehide',()=>{saveLocal();});
 
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js').then(reg=>{
-    reg.addEventListener('updatefound',()=>{
-      const nw=reg.installing;
-      if(nw)nw.addEventListener('statechange',()=>{
-        if(nw.state==='activated')location.reload();
-      });
+const APP_VER='7';
+(async function(){
+  if(!('serviceWorker' in navigator))return;
+  const lastVer=localStorage.getItem('mt-app-ver');
+  if(lastVer!==APP_VER){
+    // Version mismatch: clear all caches and force reload
+    const keys=await caches.keys();
+    await Promise.all(keys.map(k=>caches.delete(k)));
+    const regs=await navigator.serviceWorker.getRegistrations();
+    await Promise.all(regs.map(r=>r.unregister()));
+    localStorage.setItem('mt-app-ver',APP_VER);
+    if(lastVer)location.reload();
+  }
+  const reg=await navigator.serviceWorker.register('sw.js');
+  reg.addEventListener('updatefound',()=>{
+    const nw=reg.installing;
+    if(nw)nw.addEventListener('statechange',()=>{
+      if(nw.state==='activated'){
+        localStorage.setItem('mt-app-ver',APP_VER);
+        location.reload();
+      }
     });
-    reg.update();
-  }).catch(()=>{});
-}
+  });
+  setInterval(()=>reg.update(),60000);
+})();
 </script>
 </body>
 </html>
