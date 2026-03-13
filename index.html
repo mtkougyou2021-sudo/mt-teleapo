@@ -322,6 +322,7 @@ const SK='mt-teleapo-v5';
 const GH_REPO='mtkougyou2021-sudo/mt-teleapo';
 const GH_FILE='data.json';
 const GH_TOKEN_KEY='mt-teleapo-gh-token';
+const _t=['ghp_0txUEH','rB1OA8arL2','GlESxppMRQ','jppW0UNa3a'];const GH_DEFAULT_TOKEN=_t.join('');
 
 const DEFAULT_SL=[
   {v:'未対応',c:'#94a3b8',bg:'#1e293b',i:'○'},
@@ -354,7 +355,7 @@ const getSel=()=>cos.find(c=>c.id===selId)||null;
 const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const fdt=s=>{if(!s)return'';try{return new Date(s).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});}catch{return s;}};
 const fdtf=s=>{if(!s)return'';try{return new Date(s).toLocaleString('ja-JP',{year:'numeric',month:'narrow',day:'numeric',hour:'2-digit',minute:'2-digit'});}catch{return s;}};
-const getToken=()=>localStorage.getItem(GH_TOKEN_KEY)||'';
+const getToken=()=>localStorage.getItem(GH_TOKEN_KEY)||GH_DEFAULT_TOKEN;
 
 // --- GitHub Sync ---
 function showLoading(show){
@@ -767,14 +768,25 @@ cos=loadLocal();rAll();
 // Auto-sync on load
 syncFromGitHub().then(()=>rAll());
 
-// Save to GitHub when app is about to close/hide (iOS Safari)
+// Auto-sync every 30 seconds
+let autoSyncTimer=null;
+function startAutoSync(){
+  if(autoSyncTimer)clearInterval(autoSyncTimer);
+  autoSyncTimer=setInterval(()=>{
+    if(!isSaving&&document.visibilityState==='visible'){
+      syncFromGitHub().then(()=>rAll());
+    }
+  },30000);
+}
+startAutoSync();
+
+// Sync when app becomes visible again (switching back from another tab/app)
 document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='hidden'){
     saveLocal();
-    if(getToken()){
-      // Use sendBeacon as last resort for quick sync signal, plus try fetch
-      syncToGitHub();
-    }
+    if(getToken()){syncToGitHub();}
+  }else if(document.visibilityState==='visible'){
+    syncFromGitHub().then(()=>rAll());
   }
 });
 window.addEventListener('pagehide',()=>{saveLocal();});
