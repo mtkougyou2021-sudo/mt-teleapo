@@ -122,8 +122,9 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
 .btn:active{opacity:0.85;}
 .btn-p{background:linear-gradient(135deg,#ea580c,#f97316);color:#fff;}
 .btn-s{background:linear-gradient(135deg,#15803d,#22c55e);color:#fff;}
-.btn-csv{background:#f97316;color:#fff;padding:8px 14px;font-size:13px;border:none;border-radius:8px;font-weight:700;min-height:36px;}
-.btn-add{background:#15803d;color:#fff;padding:8px 14px;font-size:13px;border:none;border-radius:8px;font-weight:700;min-height:36px;}
+.btn-csv,.btn-add{color:#fff;padding:8px 0;font-size:13px;border:none;border-radius:8px;font-weight:700;min-height:36px;min-width:56px;text-align:center;}
+.btn-csv{background:#f97316;}
+.btn-add{background:#15803d;}
 .btn-2{background:#333;color:#ccc;border:1px solid #555;}
 .btn-e{background:#333;color:#ccc;border:1px solid #555;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:700;min-height:36px;}
 .btn-d{background:#2d0a0a;color:#f87171;border:1px solid #7f1d1d;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:700;min-height:36px;}
@@ -453,22 +454,30 @@ function mergeData(local,remote){
   return merged;
 }
 
+function packData(){return {contacts:cos,statusLabels:SL,callResults:CR};}
+function unpackData(data){
+  if(Array.isArray(data))return {contacts:data,statusLabels:null,callResults:null};
+  return {contacts:data.contacts||[],statusLabels:data.statusLabels||null,callResults:data.callResults||null};
+}
+
 async function syncFromGitHub(){
   showLoading(true);
   updateSyncIndicator('syncing');
   const remote=await ghRead();
-  if(remote&&Array.isArray(remote)){
-    cos=mergeData(cos,remote);
+  if(remote){
+    const rd=unpackData(remote);
+    if(rd.contacts)cos=mergeData(cos,rd.contacts);
+    if(rd.statusLabels&&rd.statusLabels.length){SL=rd.statusLabels;saveSL();}
+    if(rd.callResults&&rd.callResults.length){CR=rd.callResults;saveCR();}
     saveLocal();
     rAll();
-    // Push merged result back
-    if(getToken())await ghWrite(cos);
+    if(getToken())await ghWrite(packData());
     updateSyncIndicator('ok');
     showLoading(false);
     return true;
   }else{
     if(cos.length>0&&getToken()){
-      const ok=await ghWrite(cos);
+      const ok=await ghWrite(packData());
       updateSyncIndicator(ok?'ok':'error');
     }else{
       updateSyncIndicator(getToken()?'ok':'');
@@ -482,7 +491,7 @@ async function syncToGitHub(){
   if(!getToken()||isSaving)return;
   isSaving=true;
   updateSyncIndicator('syncing');
-  const ok=await ghWrite(cos);
+  const ok=await ghWrite(packData());
   updateSyncIndicator(ok?'ok':'error');
   isSaving=false;
   return ok;
