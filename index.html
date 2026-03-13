@@ -261,6 +261,13 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
     </div>
     <div style="margin-bottom:12px"><label class="fl">担当者名</label><input type="text" id="lcontact" placeholder="対応した担当者名"/></div>
     <div style="margin-bottom:12px"><label class="fl">次回アポ日時</label><input type="datetime-local" id="lap"/></div>
+    <div style="margin-bottom:12px;display:flex;align-items:center;gap:10px;">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;color:#e2e8f0;">
+        <input type="checkbox" id="ldm" onchange="onDmCheck()" style="width:20px;height:20px;accent-color:#f97316;cursor:pointer;flex-shrink:0;"/>
+        DM送信済み
+      </label>
+      <span id="ldm-date" style="color:#999;font-size:12px;"></span>
+    </div>
     <div style="margin-bottom:18px">
       <label class="fl">メモ</label>
       <textarea rows="3" id="lno" placeholder="メモ（任意）" style="font-size:13px;margin-top:6px;"></textarea>
@@ -616,11 +623,12 @@ function renderDetail(){
   const rows=[{l:'住所',v:c.address,i:'📍',full:true},{l:'業種',v:c.industry,i:'🏗'},{l:'電話番号',v:c.phone,i:'📱'},{l:'担当者名',v:c.contactName,i:'👤'},{l:'役職',v:c.contactTitle,i:'💼'},{l:'次回アポ',v:c.nextAppointment?fdtf(c.nextAppointment):null,i:'📅'}];
   let h='<div class="info-grid">';
   rows.forEach(r=>h+=`<div class="ic${r.full?' full':''}"><div class="ic-label">${r.l}</div><div class="ic-val${r.v?'':' empty'}">${r.v?r.i+' '+esc(r.v):'—'}</div></div>`);
+  if(c.dmSentDate)h+=`<div class="ic full"><div class="ic-label">DM送信</div><div class="ic-val" style="color:#4ade80;">✅ 送信済み（${fdtf(c.dmSentDate)}）</div></div>`;
   if(c.memo)h+=`<div class="ic full"><div class="ic-label">メモ</div><div style="color:#94a3b8;font-size:13px;white-space:pre-wrap;line-height:1.7">${esc(c.memo)}</div></div>`;
   h+='</div>';
   document.getElementById('t0').innerHTML=h;
   document.getElementById('tb1').textContent='📞 履歴 ('+(c.callHistory?.length||0)+'件)';
-  document.getElementById('t1').innerHTML=!c.callHistory?.length?'<div style="text-align:center;padding:40px;color:#334155;"><div style="font-size:32px;margin-bottom:8px">📞</div>まだ架電記録がありません</div>':c.callHistory.map(lg=>`<div class="hc"><div class="hc-top"><span class="hc-date">${lg.date}</span><span class="hc-result">${lg.result}</span></div>${lg.contact?`<div style="color:#60a5fa;font-size:12px;margin-bottom:4px;">👤 ${esc(lg.contact)}</div>`:''}${lg.note?`<div style="color:#94a3b8;font-size:13px;line-height:1.6">${esc(lg.note)}</div>`:''}${lg.nextDate?`<div style="color:#f59e0b;font-size:12px;margin-top:6px">📅 次回: ${fdt(lg.nextDate)}</div>`:''}</div>`).join('');
+  document.getElementById('t1').innerHTML=!c.callHistory?.length?'<div style="text-align:center;padding:40px;color:#334155;"><div style="font-size:32px;margin-bottom:8px">📞</div>まだ架電記録がありません</div>':c.callHistory.map(lg=>`<div class="hc"><div class="hc-top"><span class="hc-date">${lg.date}</span><span class="hc-result">${lg.result}</span></div>${lg.contact?`<div style="color:#60a5fa;font-size:12px;margin-bottom:4px;">👤 ${esc(lg.contact)}</div>`:''}${lg.dmSent?`<div style="color:#4ade80;font-size:12px;margin-bottom:4px;">✅ DM送信済み（${lg.dmDate?fdt(lg.dmDate):''}）</div>`:''}${lg.note?`<div style="color:#94a3b8;font-size:13px;line-height:1.6">${esc(lg.note)}</div>`:''}${lg.nextDate?`<div style="color:#f59e0b;font-size:12px;margin-top:6px">📅 次回: ${fdt(lg.nextDate)}</div>`:''}</div>`).join('');
 }
 
 function selCo(id){
@@ -677,9 +685,17 @@ function openLog(){
   document.getElementById('lcontact').value=c.contactName||'';
   document.getElementById('lap').value=c.nextAppointment||'';
   document.getElementById('lno').value='';
+  document.getElementById('ldm').checked=false;
+  document.getElementById('ldm-date').textContent='';
   document.getElementById('rb').innerHTML=CR.map(r=>`<button class="rb" onclick="selRes('${r}')">${r}</button>`).join('');
   document.getElementById('sbg').innerHTML=SL.map(s=>`<button class="sb" onclick="selStat('${s.v}')" style="background:${lStat===s.v?s.bg:'#0f2040'};color:${lStat===s.v?s.c:'#475569'};border-color:${lStat===s.v?s.c:'#1a3a6a'}">${s.v}</button>`).join('');
   openM('lm');
+}
+function onDmCheck(){
+  const cb=document.getElementById('ldm');
+  const dt=document.getElementById('ldm-date');
+  if(cb.checked){dt.textContent=new Date().toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});}
+  else{dt.textContent='';}
 }
 function selRes(r){
   lRes=r;
@@ -696,8 +712,10 @@ async function saveLog(){
   if(!lRes){alert('架電結果を選んでください');return;}
   const c=getSel();if(!c)return;
   const contact=document.getElementById('lcontact').value.trim();
-  const log={id:Date.now(),date:new Date().toLocaleString('ja-JP'),result:lRes,contact:contact,note:document.getElementById('lno').value,nextDate:document.getElementById('lap').value};
+  const dmChecked=document.getElementById('ldm').checked;
+  const log={id:Date.now(),date:new Date().toLocaleString('ja-JP'),result:lRes,contact:contact,note:document.getElementById('lno').value,nextDate:document.getElementById('lap').value,dmSent:dmChecked,dmDate:dmChecked?new Date().toISOString():null};
   c.callHistory=[log,...(c.callHistory||[])];c.status=lStat;
+  if(dmChecked)c.dmSentDate=new Date().toISOString();
   if(contact)c.contactName=contact;
   c.nextAppointment=document.getElementById('lap').value||c.nextAppointment;
   c.updatedAt=new Date().toISOString();
