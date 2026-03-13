@@ -2,6 +2,9 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
@@ -9,6 +12,17 @@
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="icon-192.png"/>
 <title>MT興業 テレアポ</title>
+<script>
+// Kill all Service Workers and clear all caches on every page load
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.getRegistrations().then(function(regs){
+    var hadSW=regs.length>0;
+    regs.forEach(function(r){r.unregister();});
+    if('caches' in window){caches.keys().then(function(k){k.forEach(function(n){caches.delete(n);});});}
+    if(hadSW){setTimeout(function(){location.reload();},500);}
+  });
+}
+</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 html,body{height:100%;background:#1a1a1a;font-family:-apple-system,'Hiragino Kaku Gothic ProN','Hiragino Sans','Meiryo',sans-serif;color:#e2e8f0;overflow:hidden;}
@@ -454,37 +468,65 @@ function mergeData(local,remote){
   return merged;
 }
 
-function packData(){return {contacts:cos,statusLabels:SL,callResults:CR};}
+// data.json is always a plain array for backward compatibility
+function packData(){return cos;}
 function unpackData(data){
-  if(Array.isArray(data))return {contacts:data,statusLabels:null,callResults:null};
-  return {contacts:data.contacts||[],statusLabels:data.statusLabels||null,callResults:data.callResults||null};
+  if(Array.isArray(data))return data;
+  return data.contacts||[];
 }
 
 function totalHist(arr){return arr.reduce((n,c)=>n+(c.callHistory||[]).length,0);}
 function countChanged(arr){return arr.filter(c=>c.status!=='未対応'||(c.callHistory||[]).length>0).length;}
+
+async function syncConfig(){
+  // Sync SL/CR from config.json
+  try{
+    const token=getToken();
+    const headers={};
+    if(token)headers['Authorization']='token '+token;
+    headers['Accept']='application/vnd.github.v3+json';
+    const res=await fetch(`https://api.github.com/repos/${GH_REPO}/contents/config.json`,{headers});
+    if(res.ok){
+      const d=await res.json();
+      const cfg=JSON.parse(base64ToUtf8(d.content));
+      if(cfg.statusLabels&&cfg.statusLabels.length){SL=cfg.statusLabels;saveSL();}
+      if(cfg.callResults&&cfg.callResults.length){CR=cfg.callResults;saveCR();}
+    }
+  }catch{}
+}
+
+async function saveConfig(){
+  const token=getToken();
+  if(!token)return;
+  try{
+    const headers={'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json'};
+    const getRes=await fetch(`https://api.github.com/repos/${GH_REPO}/contents/config.json`,{headers});
+    let sha=null;
+    if(getRes.ok){sha=(await getRes.json()).sha;}
+    const body={message:'sync config',content:utf8ToBase64(JSON.stringify({statusLabels:SL,callResults:CR},null,2))};
+    if(sha)body.sha=sha;
+    await fetch(`https://api.github.com/repos/${GH_REPO}/contents/config.json`,{
+      method:'PUT',headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify(body)
+    });
+  }catch{}
+}
 
 async function syncFromGitHub(){
   showLoading(true);
   updateSyncIndicator('syncing');
   const remote=await ghRead();
   if(remote){
-    const rd=unpackData(remote);
-    const rc=rd.contacts||[];
+    const rc=unpackData(remote);
     const localChanged=countChanged(cos);
     const remoteChanged=countChanged(rc);
     const localHist=totalHist(cos);
     const remoteHist=totalHist(rc);
-    // If remote has more data, prefer remote entirely
-    if(remoteHist>localHist||remoteChanged>localChanged){
-      cos=mergeData(cos,rc);
-    }else if(localHist>remoteHist||localChanged>remoteChanged){
-      cos=mergeData(cos,rc);
+    cos=mergeData(cos,rc);
+    // Only write back if local has more data
+    if(localHist>remoteHist||localChanged>remoteChanged){
       if(getToken())await ghWrite(packData());
-    }else{
-      cos=mergeData(cos,rc);
     }
-    if(rd.statusLabels&&rd.statusLabels.length){SL=rd.statusLabels;saveSL();}
-    if(rd.callResults&&rd.callResults.length){CR=rd.callResults;saveCR();}
+    await syncConfig();
     saveLocal();
     rAll();
     updateSyncIndicator('ok');
@@ -509,14 +551,12 @@ async function syncToGitHub(){
   // Safety: check remote before writing — never overwrite richer data
   const remote=await ghRead();
   if(remote){
-    const rd=unpackData(remote);
-    const rc=rd.contacts||[];
+    const rc=unpackData(remote);
     const remoteH=totalHist(rc);
     const localH=totalHist(cos);
     const remoteC=countChanged(rc);
     const localC=countChanged(cos);
     if(remoteH>localH||remoteC>localC){
-      // Remote has more data, merge into local instead of overwriting
       cos=mergeData(cos,rc);
       saveLocal();rAll();
       isSaving=false;
@@ -780,11 +820,11 @@ function addCR(){
   const v=inp.value.trim();
   if(!v){return;}
   if(CR.includes(v)){alert('既に存在します');return;}
-  CR.push(v);saveCR();renderCfgCR();inp.value='';
+  CR.push(v);saveCR();saveConfig();renderCfgCR();inp.value='';
 }
 function removeCR(i){
   if(!confirm('「'+CR[i]+'」を削除しますか？'))return;
-  CR.splice(i,1);saveCR();renderCfgCR();
+  CR.splice(i,1);saveCR();saveConfig();renderCfgCR();
 }
 function addSL(){
   const inp=document.getElementById('new-sl');
@@ -793,11 +833,11 @@ function addSL(){
   if(SL.some(s=>s.v===v)){alert('既に存在します');return;}
   const ci=SL.length%COLORS.length;
   SL.push({v:v,c:COLORS[ci],bg:BGS[ci],i:'●'});
-  saveSL();renderCfgSL();inp.value='';
+  saveSL();saveConfig();renderCfgSL();inp.value='';
 }
 function removeSL(i){
   if(!confirm('「'+SL[i].v+'」を削除しますか？'))return;
-  SL.splice(i,1);saveSL();renderCfgSL();
+  SL.splice(i,1);saveSL();saveConfig();renderCfgSL();
 }
 
 function openM(id){
@@ -851,31 +891,6 @@ document.addEventListener('visibilitychange',()=>{
 });
 window.addEventListener('pagehide',()=>{saveLocal();});
 
-const APP_VER='9';
-(async function(){
-  if(!('serviceWorker' in navigator))return;
-  const lastVer=localStorage.getItem('mt-app-ver');
-  if(lastVer!==APP_VER){
-    // Version mismatch: clear all caches and force reload
-    const keys=await caches.keys();
-    await Promise.all(keys.map(k=>caches.delete(k)));
-    const regs=await navigator.serviceWorker.getRegistrations();
-    await Promise.all(regs.map(r=>r.unregister()));
-    localStorage.setItem('mt-app-ver',APP_VER);
-    if(lastVer)location.reload();
-  }
-  const reg=await navigator.serviceWorker.register('sw.js');
-  reg.addEventListener('updatefound',()=>{
-    const nw=reg.installing;
-    if(nw)nw.addEventListener('statechange',()=>{
-      if(nw.state==='activated'){
-        localStorage.setItem('mt-app-ver',APP_VER);
-        location.reload();
-      }
-    });
-  });
-  setInterval(()=>reg.update(),60000);
-})();
 </script>
 </body>
 </html>
