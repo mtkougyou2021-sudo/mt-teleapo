@@ -1,7 +1,7 @@
-const CACHE_NAME = 'mt-teleapo-v2';
+const CACHE_NAME = 'mt-teleapo-v3';
 const ASSETS = [
   './',
-  './MT興業_テレアポ.html',
+  './index.html',
   './manifest.json'
 ];
 
