@@ -760,8 +760,21 @@
     "memo": "",
     "status": "未対応",
     "nextAppointment": "",
-    "callHistory": [],
-    "createdAt": "2026-03-12T06:40:27.830Z"
+    "callHistory": [
+      {
+        "id": 1773647173511,
+        "date": "2026/3/16 16:46:13",
+        "result": "担当者不在",
+        "status": "未対応",
+        "contact": "",
+        "note": "",
+        "nextDate": "",
+        "dmSent": false,
+        "dmDate": null
+      }
+    ],
+    "createdAt": "2026-03-12T06:40:27.830Z",
+    "updatedAt": "2026-03-16T07:46:13.512Z"
   },
   {
     "id": "1773297627830-0.13668693157915823",
