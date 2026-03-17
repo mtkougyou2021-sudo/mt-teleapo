@@ -305,10 +305,23 @@
     "contactName": "",
     "contactTitle": "",
     "memo": "",
-    "status": "未対応",
+    "status": "お断り",
     "nextAppointment": "",
-    "callHistory": [],
-    "createdAt": "2026-03-12T06:40:27.829Z"
+    "callHistory": [
+      {
+        "id": 1773732686333,
+        "date": "2026/3/17 16:31:26",
+        "result": "お断り",
+        "status": "お断り",
+        "contact": "",
+        "note": "電話番号、不可",
+        "nextDate": "",
+        "dmSent": false,
+        "dmDate": null
+      }
+    ],
+    "createdAt": "2026-03-12T06:40:27.829Z",
+    "updatedAt": "2026-03-17T07:31:26.333Z"
   },
   {
     "id": "1773297627829-0.5850858359280969",
