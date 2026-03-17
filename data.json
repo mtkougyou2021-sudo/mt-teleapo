@@ -302,10 +302,23 @@
     "contactName": "",
     "contactTitle": "",
     "memo": "",
-    "status": "未対応",
+    "status": "お断り",
     "nextAppointment": "",
-    "callHistory": [],
-    "createdAt": "2026-03-12T06:40:27.829Z"
+    "callHistory": [
+      {
+        "id": 1773731780576,
+        "date": "2026/3/17 16:16:20",
+        "result": "お断り",
+        "status": "お断り",
+        "contact": "",
+        "note": "電話番号、使われていない。",
+        "nextDate": "",
+        "dmSent": false,
+        "dmDate": null
+      }
+    ],
+    "createdAt": "2026-03-12T06:40:27.829Z",
+    "updatedAt": "2026-03-17T07:16:20.576Z"
   },
   {
     "id": "1773297627829-0.30007310042589797",
