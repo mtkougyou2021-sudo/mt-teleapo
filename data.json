@@ -346,10 +346,23 @@
     "contactName": "",
     "contactTitle": "",
     "memo": "",
-    "status": "未対応",
+    "status": "お断り",
     "nextAppointment": "",
-    "callHistory": [],
-    "createdAt": "2026-03-12T06:40:27.829Z"
+    "callHistory": [
+      {
+        "id": 1773732556901,
+        "date": "2026/3/17 16:29:16",
+        "result": "お断り",
+        "status": "お断り",
+        "contact": "",
+        "note": "足場は使わない",
+        "nextDate": "",
+        "dmSent": false,
+        "dmDate": null
+      }
+    ],
+    "createdAt": "2026-03-12T06:40:27.829Z",
+    "updatedAt": "2026-03-17T07:29:16.901Z"
   },
   {
     "id": "1773297627829-0.08951309827727372",
