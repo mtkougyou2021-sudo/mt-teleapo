@@ -782,13 +782,26 @@
     "address": "",
     "industry": "重防食塗装・防水",
     "phone": "05279-9-5441",
-    "contactName": "",
+    "contactName": "あき",
     "contactTitle": "",
     "memo": "",
-    "status": "未対応",
+    "status": "お断り",
     "nextAppointment": "",
-    "callHistory": [],
-    "createdAt": "2026-03-12T06:40:27.830Z"
+    "callHistory": [
+      {
+        "id": 1773713925934,
+        "date": "2026/3/17 11:18:45",
+        "result": "お断り",
+        "status": "お断り",
+        "contact": "あき",
+        "note": "今は募集していない。",
+        "nextDate": "",
+        "dmSent": false,
+        "dmDate": null
+      }
+    ],
+    "createdAt": "2026-03-12T06:40:27.830Z",
+    "updatedAt": "2026-03-17T02:18:45.935Z"
   },
   {
     "id": "1773297627830-0.7740458538469759",
