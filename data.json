@@ -241,17 +241,6 @@
     "nextAppointment": "",
     "callHistory": [
       {
-        "id": 1773731743500,
-        "date": "2026/3/17 16:15:43",
-        "result": "お断り",
-        "status": "お断り",
-        "contact": "",
-        "note": "電話番号、現在使われていません。",
-        "nextDate": "",
-        "dmSent": false,
-        "dmDate": null
-      },
-      {
         "id": 1773731070163,
         "date": "2026/3/17 16:04:30",
         "result": "お断り",
@@ -264,7 +253,7 @@
       }
     ],
     "createdAt": "2026-03-12T06:40:27.829Z",
-    "updatedAt": "2026-03-17T07:15:43.501Z"
+    "updatedAt": "2026-03-17T07:04:30.163Z"
   },
   {
     "id": "1773297627829-0.527767342736246",
@@ -302,23 +291,10 @@
     "contactName": "",
     "contactTitle": "",
     "memo": "",
-    "status": "お断り",
+    "status": "未対応",
     "nextAppointment": "",
-    "callHistory": [
-      {
-        "id": 1773731780576,
-        "date": "2026/3/17 16:16:20",
-        "result": "お断り",
-        "status": "お断り",
-        "contact": "",
-        "note": "電話番号、使われていない。",
-        "nextDate": "",
-        "dmSent": false,
-        "dmDate": null
-      }
-    ],
-    "createdAt": "2026-03-12T06:40:27.829Z",
-    "updatedAt": "2026-03-17T07:16:20.576Z"
+    "callHistory": [],
+    "createdAt": "2026-03-12T06:40:27.829Z"
   },
   {
     "id": "1773297627829-0.30007310042589797",
