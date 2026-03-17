@@ -399,10 +399,23 @@
     "contactName": "",
     "contactTitle": "",
     "memo": "",
-    "status": "未対応",
-    "nextAppointment": "",
-    "callHistory": [],
-    "createdAt": "2026-03-12T06:40:27.829Z"
+    "status": "不在",
+    "nextAppointment": "2026-03-23T16:45",
+    "callHistory": [
+      {
+        "id": 1773733548795,
+        "date": "2026/3/17 16:45:48",
+        "result": "担当者不在",
+        "status": "不在",
+        "contact": "",
+        "note": "23日の週以降で連絡する",
+        "nextDate": "2026-03-23T16:45",
+        "dmSent": false,
+        "dmDate": null
+      }
+    ],
+    "createdAt": "2026-03-12T06:40:27.829Z",
+    "updatedAt": "2026-03-17T07:45:48.795Z"
   },
   {
     "id": "1773297627829-0.9829239640676347",
