@@ -319,10 +319,23 @@
     "contactName": "",
     "contactTitle": "",
     "memo": "",
-    "status": "未対応",
+    "status": "折り返し",
     "nextAppointment": "",
-    "callHistory": [],
-    "createdAt": "2026-03-12T06:40:27.829Z"
+    "callHistory": [
+      {
+        "id": 1773731912480,
+        "date": "2026/3/17 16:18:32",
+        "result": "担当者不在",
+        "status": "折り返し",
+        "contact": "",
+        "note": "本日はやすんでいるので、日にち改めてご連絡",
+        "nextDate": "",
+        "dmSent": false,
+        "dmDate": null
+      }
+    ],
+    "createdAt": "2026-03-12T06:40:27.829Z",
+    "updatedAt": "2026-03-17T07:18:32.480Z"
   },
   {
     "id": "1773297627829-0.9662057387716513",
