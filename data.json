@@ -197,11 +197,23 @@
     "contactName": "",
     "contactTitle": "",
     "memo": "",
-    "status": "未対応",
+    "status": "お断り",
     "nextAppointment": "",
-    "callHistory": [],
+    "callHistory": [
+      {
+        "id": 1773730653813,
+        "date": "2026/3/17 15:57:33",
+        "result": "お断り",
+        "status": "お断り",
+        "contact": "",
+        "note": "弊社は足場を使わない",
+        "nextDate": "",
+        "dmSent": false,
+        "dmDate": null
+      }
+    ],
     "createdAt": "2026-03-12T06:40:27.829Z",
-    "updatedAt": "2026-03-13T08:02:59.020Z"
+    "updatedAt": "2026-03-17T06:57:33.814Z"
   },
   {
     "id": "1773297627829-0.2664407397613414",
