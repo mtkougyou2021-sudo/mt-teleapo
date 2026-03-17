@@ -224,23 +224,10 @@
     "contactName": "",
     "contactTitle": "",
     "memo": "",
-    "status": "不在",
+    "status": "未対応",
     "nextAppointment": "",
-    "callHistory": [
-      {
-        "id": 1773730826952,
-        "date": "2026/3/17 16:00:26",
-        "result": "担当者不在",
-        "status": "不在",
-        "contact": "",
-        "note": "担当者不在",
-        "nextDate": "",
-        "dmSent": false,
-        "dmDate": null
-      }
-    ],
-    "createdAt": "2026-03-12T06:40:27.829Z",
-    "updatedAt": "2026-03-17T07:00:26.952Z"
+    "callHistory": [],
+    "createdAt": "2026-03-12T06:40:27.829Z"
   },
   {
     "id": "1773297627829-0.527767342736246",
