@@ -3184,8 +3184,22 @@
     "memo": "",
     "status": "未対応",
     "nextAppointment": "",
-    "callHistory": [],
-    "createdAt": "2026-03-12T06:40:27.835Z"
+    "callHistory": [
+      {
+        "id": 1773734533263,
+        "date": "2026/3/17 17:02:13",
+        "result": "再架電",
+        "status": "未対応",
+        "contact": "",
+        "note": "",
+        "nextDate": "",
+        "dmSent": true,
+        "dmDate": "2026-03-17T08:02:13.263Z"
+      }
+    ],
+    "createdAt": "2026-03-12T06:40:27.835Z",
+    "dmSentDate": "2026-03-17T08:02:13.263Z",
+    "updatedAt": "2026-03-17T08:02:13.263Z"
   },
   {
     "id": "1773297627835-0.18415646168271804",
