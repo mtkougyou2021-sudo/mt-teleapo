@@ -9025,21 +9025,6 @@
     "updatedAt": "2026-03-27T00:26:06.693Z"
   },
   {
-    "id": "1774571166693-0.36287753407715495",
-    "companyName": "ザ・シーズン 名古屋店",
-    "address": "〒464-0819 愛知県名古屋市千種区四谷通１丁目７ ビレッジよつや 1階",
-    "industry": "エクステリアショップ",
-    "phone": "05278-1-7440",
-    "contactName": "",
-    "contactTitle": "",
-    "memo": "",
-    "status": "未対応",
-    "nextAppointment": "",
-    "callHistory": [],
-    "createdAt": "2026-03-27T00:26:06.693Z",
-    "updatedAt": "2026-03-27T00:26:06.693Z"
-  },
-  {
     "id": "1774571166693-0.13317612019430558",
     "companyName": "三共コンクリート 岡崎工場",
     "address": "〒444-0005 愛知県岡崎市岡町下野川６７",
@@ -9228,11 +9213,20 @@
     "contactName": "",
     "contactTitle": "",
     "memo": "",
-    "status": "未対応",
-    "nextAppointment": "",
-    "callHistory": [],
+    "status": "お断り",
+    "nextAppointment": "2026-03-27T09:47",
+    "callHistory": [
+      {
+        "id": 1774572458050,
+        "date": "2026/3/27 9:47:38",
+        "result": "お断り",
+        "contact": "",
+        "note": "",
+        "nextDate": "2026-03-27T09:47"
+      }
+    ],
     "createdAt": "2026-03-27T00:26:06.693Z",
-    "updatedAt": "2026-03-27T00:26:06.693Z"
+    "updatedAt": "2026-03-27T00:47:38.051Z"
   },
   {
     "id": "1774571166693-0.18314854891377863",
