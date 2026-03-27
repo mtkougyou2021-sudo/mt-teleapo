@@ -5655,14 +5655,23 @@
     "address": "〒467-0807 愛知県名古屋市瑞穂区駒場町７丁目４",
     "industry": "建設",
     "phone": "05285-3-1100",
-    "contactName": "",
+    "contactName": "中橋様",
     "contactTitle": "",
     "memo": "",
-    "status": "未対応",
-    "nextAppointment": "",
-    "callHistory": [],
+    "status": "アポ取得",
+    "nextAppointment": "2026-04-20T10:00",
+    "callHistory": [
+      {
+        "id": 1774598391775,
+        "date": "2026/3/27 16:59:51",
+        "result": "アポ取得",
+        "contact": "中橋様",
+        "note": "",
+        "nextDate": "2026-04-20T10:00"
+      }
+    ],
     "createdAt": "2026-03-27T00:26:06.693Z",
-    "updatedAt": "2026-03-27T00:26:06.693Z"
+    "updatedAt": "2026-03-27T07:59:51.775Z"
   },
   {
     "id": "1774571166693-0.4817322878320913",
