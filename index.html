@@ -346,8 +346,8 @@ function saveCR(){localStorage.setItem('mt-teleapo-cr',JSON.stringify(CR));}
 
 let SL=loadSL();
 let CR=loadCR();
-const FM={companyName:['会社名','会社','company','企業名','業者名'],address:['住所','address','所在地'],industry:['業種','業態','industry'],phone:['電話','tel','phone','電話番号'],contactName:['担当者','担当','contact','氏名','名前'],contactTitle:['役職','肩書','title'],memo:['備考','メモ','note','memo']};
-const ADDR_PARTS=['都道府県','市区町村','町域','番地','住所1','住所2','住所3','所在地1','所在地2','所在地3','丁目番地','ビル名','建物名','市町村','区','町','丁目','番','号'];
+const FM={companyName:['会社名','会社','company','企業名','業者名'],address:['住所','address','所在地','本社所在地','事業所住所','事業所所在地','拠点住所'],industry:['業種','業態','industry','事業内容','業界'],phone:['電話','tel','phone','電話番号','TEL','代表電話'],contactName:['担当者','担当','contact','氏名','名前','代表者','代表者名','連絡先担当'],contactTitle:['役職','肩書','title'],memo:['備考','メモ','note','memo','コメント','特記']};
+const ADDR_PARTS=['都道府県','市区町村','町域','番地','住所1','住所2','住所3','所在地1','所在地2','所在地3','丁目番地','ビル名','建物名','市町村','区','町','丁目','番','号','都道府県名','市区町村名','字','県','市','郡'];
 
 let cos=[],selId=null,fMode='add',lRes='',lStat='',ghSha=null,isSaving=false;
 
@@ -855,9 +855,9 @@ document.getElementById('fp').addEventListener('input',function(){
 });
 
 // v2: 強制リセット（業種整理・重複除去の反映）
-if(!localStorage.getItem('mt-teleapo-reset-v5')){
+if(!localStorage.getItem('mt-teleapo-reset-v6')){
   localStorage.removeItem(SK);
-  localStorage.setItem('mt-teleapo-reset-v5','1');
+  localStorage.setItem('mt-teleapo-reset-v6','1');
 }
 cos=loadLocal();rAll();
 // Auto-sync on load
