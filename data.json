@@ -17751,14 +17751,23 @@
     "address": "〒510-0012 三重県四日市市羽津 字山之奥戊１４番１５（斎宮西交差点から北勢バイパス【四日市方面】の付加車線に出入口あり",
     "industry": "清掃",
     "phone": "05933-2-0750",
-    "contactName": "",
+    "contactName": "不明",
     "contactTitle": "",
     "memo": "",
-    "status": "未対応",
-    "nextAppointment": "",
-    "callHistory": [],
+    "status": "折り返し",
+    "nextAppointment": "2026-04-01T16:20",
+    "callHistory": [
+      {
+        "id": 1774596082077,
+        "date": "2026/3/27 16:21:22",
+        "result": "担当者不在",
+        "contact": "不明",
+        "note": "来週の平日に連絡",
+        "nextDate": "2026-04-01T16:20"
+      }
+    ],
     "createdAt": "2026-03-27T00:44:19.673Z",
-    "updatedAt": "2026-03-27T00:44:19.673Z"
+    "updatedAt": "2026-03-27T07:21:22.077Z"
   },
   {
     "id": "1774572259673-0.7477918125515531",
