@@ -182,8 +182,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
           </select>
           <select id="fi" onchange="renderList()">
             <option value="">全業種</option>
-            <option>外壁塗装</option><option>工務店</option><option>建設業</option>
-            <option>ゼネコン</option><option>リフォーム</option><option>設計事務所</option><option>不動産</option><option>その他</option>
           </select>
         </div>
       </div>
@@ -239,8 +237,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
         <label class="fl">業種</label>
         <select id="fin">
           <option value="">選択してください</option>
-          <option>外壁塗装</option><option>工務店</option><option>建設業</option>
-          <option>ゼネコン</option><option>リフォーム</option><option>設計事務所</option><option>不動産</option><option>その他</option>
         </select>
       </div>
       <div class="ff full"><label class="fl">次回アポ</label><input type="datetime-local" id="fap"/></div>
@@ -646,6 +642,14 @@ function rAll(){
   document.getElementById('sa').textContent=cos.filter(c=>c.status==='アポ取得').length;
   document.getElementById('sb2').textContent=cos.filter(c=>c.status==='折り返し待').length;
   updateFilterOptions();
+  // 業種フィルター・フォームを動的更新
+  const inds=[...new Set(cos.map(c=>c.industry).filter(Boolean))].sort();
+  const fiSel=document.getElementById('fi');
+  const curFi=fiSel.value;
+  fiSel.innerHTML='<option value="">全業種</option>'+inds.map(i=>`<option${i===curFi?' selected':''}>${i}</option>`).join('');
+  const finSel=document.getElementById('fin');
+  const curFin=finSel.value;
+  finSel.innerHTML='<option value="">選択してください</option>'+inds.map(i=>`<option${i===curFin?' selected':''}>${i}</option>`).join('');
   renderList();
   if(selId)renderDetail();
 }
@@ -837,6 +841,11 @@ document.getElementById('fp').addEventListener('input',function(){
   this.value=this.value.replace(/[^0-9\-]/g,'');
 });
 
+// v2: 強制リセット（業種整理・重複除去の反映）
+if(!localStorage.getItem('mt-teleapo-reset-v2')){
+  localStorage.removeItem(SK);
+  localStorage.setItem('mt-teleapo-reset-v2','1');
+}
 cos=loadLocal();rAll();
 // Auto-sync on load
 syncFromGitHub().then(()=>rAll());
