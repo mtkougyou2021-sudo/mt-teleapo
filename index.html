@@ -265,8 +265,8 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
     <div style="margin-bottom:12px"><label class="fl">担当者名</label><input type="text" id="lcontact" placeholder="対応した担当者名"/></div>
     <div style="margin-bottom:12px"><label class="fl">次回アポ日時</label><input type="datetime-local" id="lap"/></div>
     <div style="margin-bottom:18px">
-      <button type="button" onclick="toggleMemo()" style="background:transparent;border:none;color:#475569;font-size:12px;padding:4px 0;cursor:pointer;" id="memo-toggle">+ メモを追加</button>
-      <div id="memo-wrap" style="display:none;margin-top:6px;"><textarea rows="2" id="lno" placeholder="メモ（任意）" style="font-size:13px;"></textarea></div>
+      <label class="fl" style="margin-bottom:8px">メモ（繁忙期・特記事項など）</label>
+      <textarea rows="3" id="lno" placeholder="例：繁忙期は4〜6月、決裁者は部長" style="font-size:13px;"></textarea>
     </div>
     <div class="ma">
       <button class="btn btn-p btn-full" onclick="saveLog()">保存する</button>
