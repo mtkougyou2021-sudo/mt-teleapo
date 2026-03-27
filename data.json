@@ -5556,14 +5556,23 @@
     "address": "〒461-0022 愛知県名古屋市東区東大曽根町４７−１０",
     "industry": "建設",
     "phone": "05290-8-1939",
-    "contactName": "",
+    "contactName": "下境田",
     "contactTitle": "",
     "memo": "",
-    "status": "未対応",
-    "nextAppointment": "",
-    "callHistory": [],
+    "status": "アポ取得",
+    "nextAppointment": "2026-04-11T15:00",
+    "callHistory": [
+      {
+        "id": 1774598316813,
+        "date": "2026/3/27 16:58:36",
+        "result": "アポ取得",
+        "contact": "下境田",
+        "note": "",
+        "nextDate": "2026-04-11T15:00"
+      }
+    ],
     "createdAt": "2026-03-27T00:26:06.693Z",
-    "updatedAt": "2026-03-27T00:26:06.693Z"
+    "updatedAt": "2026-03-27T07:58:36.813Z"
   },
   {
     "id": "1774571166693-0.4042570508697686",
