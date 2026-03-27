@@ -630,7 +630,7 @@ function handleCSV(inp){
 function updateFilterOptions(){
   const sel=document.getElementById('fs');
   const cur=sel.value;
-  sel.innerHTML='<option value="">全ステータス</option>'+SL.map(s=>`<option>${s.v}</option>`).join('');
+  sel.innerHTML='<option value="">全ステータス</option><option value="__called__">架電済</option>'+SL.map(s=>`<option>${s.v}</option>`).join('');
   sel.value=cur;
 }
 function rAll(){
@@ -655,7 +655,7 @@ function renderList(){
   const fs=document.getElementById('fs').value;
   const fi=document.getElementById('fi').value;
   const fa2=document.getElementById('fa2').value;
-  const f=cos.filter(c=>(!q||c.companyName.toLowerCase().includes(q)||(c.address||'').toLowerCase().includes(q)||(c.contactName||'').toLowerCase().includes(q))&&(!fs||c.status===fs)&&(!fi||c.industry===fi)&&(!fa2||(c.address||'').includes(fa2)));
+  const f=cos.filter(c=>(!q||c.companyName.toLowerCase().includes(q)||(c.address||'').toLowerCase().includes(q)||(c.contactName||'').toLowerCase().includes(q))&&(!fs||(fs==='__called__'?(c.callHistory&&c.callHistory.length>0):c.status===fs))&&(!fi||c.industry===fi)&&(!fa2||(c.address||'').includes(fa2)));
   document.getElementById('lf').textContent=f.length+' / '+cos.length+' 件';
   const bd=document.getElementById('list-body');
   if(!f.length){
