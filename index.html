@@ -746,10 +746,6 @@ async function saveForm(){
 }
 
 function toggleMemo(){
-  const w=document.getElementById('memo-wrap');
-  const t=document.getElementById('memo-toggle');
-  if(w.style.display==='none'){w.style.display='block';t.textContent='- メモを閉じる';}
-  else{w.style.display='none';t.textContent='+ メモを追加';}
 }
 
 function openLog(){
@@ -759,8 +755,6 @@ function openLog(){
   document.getElementById('lcontact').value=c.contactName||'';
   document.getElementById('lap').value=c.nextAppointment||'';
   document.getElementById('lno').value='';
-  document.getElementById('memo-wrap').style.display='none';
-  document.getElementById('memo-toggle').textContent='+ メモを追加';
   document.getElementById('rb').innerHTML=CR.map(r=>`<button class="rb" onclick="selRes('${r}')">${r}</button>`).join('');
   document.getElementById('sbg').innerHTML=SL.map(s=>`<button class="sb" onclick="selStat('${s.v}')" style="background:${lStat===s.v?s.bg:'#0f2040'};color:${lStat===s.v?s.c:'#475569'};border-color:${lStat===s.v?s.c:'#1a3a6a'}">${s.v}</button>`).join('');
   openM('lm');
