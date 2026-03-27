@@ -432,21 +432,33 @@ function mergeData(local,remote){
   const localMap=new Map(local.map(c=>[c.id,c]));
   const remoteMap=new Map(remote.map(c=>[c.id,c]));
   const allIds=new Set([...localMap.keys(),...remoteMap.keys()]);
-  const merged=[];
+  const byId=[];
   allIds.forEach(id=>{
     const l=localMap.get(id);
     const r=remoteMap.get(id);
-    if(!l){merged.push(r);return;}
-    if(!r){merged.push(l);return;}
-    // Both exist: keep the one with more call history, or more recent updatedAt
+    if(!l){byId.push(r);return;}
+    if(!r){byId.push(l);return;}
     const lHist=(l.callHistory||[]).length;
     const rHist=(r.callHistory||[]).length;
-    if(lHist!==rHist){merged.push(lHist>rHist?l:r);return;}
+    if(lHist!==rHist){byId.push(lHist>rHist?l:r);return;}
     const lTime=new Date(l.updatedAt||l.createdAt||0).getTime();
     const rTime=new Date(r.updatedAt||r.createdAt||0).getTime();
-    merged.push(lTime>=rTime?l:r);
+    byId.push(lTime>=rTime?l:r);
   });
-  return merged;
+  // 会社名ベースで重複除去（架電履歴・ステータスが充実した方を残す）
+  const nameMap=new Map();
+  byId.forEach(c=>{
+    const name=(c.companyName||'').trim();
+    if(!name)return;
+    const existing=nameMap.get(name);
+    if(!existing){nameMap.set(name,c);return;}
+    const eH=(existing.callHistory||[]).length;
+    const cH=(c.callHistory||[]).length;
+    const eS=existing.status!=='未対応'?1:0;
+    const cS=c.status!=='未対応'?1:0;
+    if(cH>eH||(cH===eH&&cS>eS))nameMap.set(name,c);
+  });
+  return [...nameMap.values()];
 }
 
 async function syncFromGitHub(){
@@ -843,9 +855,9 @@ document.getElementById('fp').addEventListener('input',function(){
 });
 
 // v2: 強制リセット（業種整理・重複除去の反映）
-if(!localStorage.getItem('mt-teleapo-reset-v4')){
+if(!localStorage.getItem('mt-teleapo-reset-v5')){
   localStorage.removeItem(SK);
-  localStorage.setItem('mt-teleapo-reset-v4','1');
+  localStorage.setItem('mt-teleapo-reset-v5','1');
 }
 cos=loadLocal();rAll();
 // Auto-sync on load
