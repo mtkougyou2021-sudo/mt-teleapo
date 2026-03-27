@@ -347,6 +347,7 @@ function saveCR(){localStorage.setItem('mt-teleapo-cr',JSON.stringify(CR));}
 let SL=loadSL();
 let CR=loadCR();
 const FM={companyName:['会社名','会社','company','企業名','業者名'],address:['住所','address','所在地'],industry:['業種','業態','industry'],phone:['電話','tel','phone','電話番号'],contactName:['担当者','担当','contact','氏名','名前'],contactTitle:['役職','肩書','title'],memo:['備考','メモ','note','memo']};
+const ADDR_PARTS=['都道府県','市区町村','町域','番地','住所1','住所2','住所3','所在地1','所在地2','所在地3','丁目番地','ビル名','建物名','市町村','区','町','丁目','番','号'];
 
 let cos=[],selId=null,fMode='add',lRes='',lStat='',ghSha=null,isSaving=false;
 
@@ -537,9 +538,15 @@ function handleCSV(inp){
     const hd=rows[0].map(function(h){return String(h||'').trim();});
     const map={};
     hd.forEach(function(h,i){const hl=h.toLowerCase();for(const[f,ps]of Object.entries(FM))if(map[f]===undefined&&ps.some(function(p){return hl.includes(p.toLowerCase());}))map[f]=i;});
+    // 住所分割カラムのインデックス収集
+    const addrIdx=[];
+    hd.forEach(function(h,i){var ht=h.replace(/[\s"]/g,'');if(ADDR_PARTS.some(function(p){return ht===p;}))addrIdx.push(i);});
     const allRows=rows.slice(1).map(function(cols){
       cols=cols.map(function(v){return String(v||'').trim();});
-      const c=nc();for(const[f,i]of Object.entries(map))if(i!==undefined&&cols[i])c[f]=cols[i];return c;
+      const c=nc();for(const[f,i]of Object.entries(map))if(i!==undefined&&cols[i])c[f]=cols[i];
+      // 住所が空で分割カラムがある場合は結合
+      if(!c.address&&addrIdx.length){c.address=addrIdx.map(function(i){return cols[i]||'';}).filter(Boolean).join('');}
+      return c;
     }).filter(function(c){return c.companyName;});
     if(!allRows.length){alert('会社名列が見つかりませんでした');return;}
     const normPhone=function(p){return(p||'').replace(/[\s\-\u3000\uff0d（）()]/g,'').replace(/[０-９]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0xFEE0);});};
