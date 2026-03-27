@@ -123,6 +123,12 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
 .btn-p{background:linear-gradient(135deg,#ea580c,#f97316);color:#fff;}
 .btn-s{background:linear-gradient(135deg,#15803d,#22c55e);color:#fff;}
 .btn-csv{background:#f97316;color:#fff;padding:8px 14px;font-size:13px;border:none;border-radius:8px;font-weight:700;min-height:36px;}
+.drop-ov{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(249,115,22,0.25);z-index:99999;justify-content:center;align-items:center;pointer-events:none;}
+.drop-ov.active{display:flex;}
+.drop-ov-inner{background:#1a1a1a;border:3px dashed #f97316;border-radius:20px;padding:40px 60px;text-align:center;}
+.drop-ov-inner .di{font-size:48px;margin-bottom:12px;}
+.drop-ov-inner p{color:#fb923c;font-size:18px;font-weight:700;}
+.drop-ov-inner small{color:#888;font-size:13px;}
 .btn-add{background:#15803d;color:#fff;padding:8px 14px;font-size:13px;border:none;border-radius:8px;font-weight:700;min-height:36px;}
 .btn-2{background:#333;color:#ccc;border:1px solid #555;}
 .btn-e{background:#333;color:#ccc;border:1px solid #555;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:700;min-height:36px;}
@@ -136,6 +142,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
 </style>
 </head>
 <body>
+<div class="drop-ov" id="drop-ov"><div class="drop-ov-inner"><div class="di">📥</div><p>ファイルをドロップ</p><small>CSV・Excel をここに離すとインポート</small></div></div>
 <div class="loading-bar" id="loadbar" style="width:0;display:none"></div>
 <div id="app">
   <div id="main">
@@ -145,8 +152,8 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
           <div class="logo"><span>MT</span>興業<small>テレアポ</small></div>
           <div class="header-btns">
             <span class="sync-indicator" id="sync-ind"></span>
-            <button class="btn-csv" onclick="document.getElementById('csv-input').click()">CSV</button>
-            <input type="file" id="csv-input" accept=".csv" style="display:none" onchange="handleCSV(this)"/>
+            <button class="btn-csv" onclick="document.getElementById('csv-input').click()">📥 取込</button>
+            <input type="file" id="csv-input" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleCSV(this)"/>
             <button class="btn-add" onclick="openAdd()">+ 追加</button>
             <button class="btn-gear" onclick="openM('sm')" title="同期設定">⚙</button>
           </div>
@@ -525,21 +532,31 @@ function badge(v,big){
 }
 
 function handleCSV(inp){
-  const file=inp.files[0];if(!file)return;
-  const r=new FileReader();
-  r.onload=e=>{
-    const txt=e.target.result;
-    const lines=txt.split(/\r?\n/).filter(l=>l.trim());
-    if(lines.length<2){alert('データがありません');return;}
-    const sp=l=>{const res=[];let cur='',q=false;for(const ch of l){if(ch==='"'){q=!q;}else if(ch===','&&!q){res.push(cur.trim());cur='';}else cur+=ch;}res.push(cur.trim());return res;};
-    const hd=sp(lines[0]);const map={};
-    hd.forEach((h,i)=>{const hl=h.toLowerCase();for(const[f,ps]of Object.entries(FM))if(map[f]===undefined&&ps.some(p=>hl.includes(p.toLowerCase())))map[f]=i;});
-    const allRows=lines.slice(1).map(l=>{const cols=sp(l);const c=nc();for(const[f,i]of Object.entries(map))if(i!==undefined&&cols[i])c[f]=cols[i];return c;}).filter(c=>c.companyName);
+  const file=inp instanceof File?inp:inp.files[0];if(!file)return;
+  if(inp.value!==undefined)inp.value='';
+  const isExcel=/\.xlsx?$/i.test(file.name);
+
+  const doImport=function(rows){
+    if(rows.length<2){alert('データがありません');return;}
+    const hd=rows[0].map(function(h){return String(h||'').trim();});
+    const map={};
+    hd.forEach(function(h,i){const hl=h.toLowerCase();for(const[f,ps]of Object.entries(FM))if(map[f]===undefined&&ps.some(function(p){return hl.includes(p.toLowerCase());}))map[f]=i;});
+    const allRows=rows.slice(1).map(function(cols){
+      cols=cols.map(function(v){return String(v||'').trim();});
+      const c=nc();for(const[f,i]of Object.entries(map))if(i!==undefined&&cols[i])c[f]=cols[i];return c;
+    }).filter(function(c){return c.companyName;});
     if(!allRows.length){alert('会社名列が見つかりませんでした');return;}
-    const normPhone=p=>(p||'').replace(/[\s\-\u3000\uff0d（）()]/g,'').replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0));
-    const isFree=p=>/^(0120|0800|0570)/.test(p);
-    const noPhone=[];const freeDial=[];const lst=[];
-    allRows.forEach(c=>{
+    const normPhone=function(p){return(p||'').replace(/[\s\-\u3000\uff0d（）()]/g,'').replace(/[０-９]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0xFEE0);});};
+    const isFree=function(p){return/^(0120|0800|0570)/.test(p);};
+    // 既存データの会社名セット（重複チェック用）
+    const existNames=new Set(cos.map(function(c){return c.companyName.trim();}));
+    const noPhone=[];const freeDial=[];const dupSkip=[];const lst=[];
+    const seenInFile=new Set();
+    allRows.forEach(function(c){
+      const name=c.companyName.trim();
+      // 重複チェック：既存データ or ファイル内重複
+      if(existNames.has(name)||seenInFile.has(name)){dupSkip.push(name);return;}
+      seenInFile.add(name);
       const np=normPhone(c.phone);
       if(!np){noPhone.push(c.companyName);return;}
       if(isFree(np)){freeDial.push(c.companyName+' ('+c.phone+')');return;}
@@ -548,12 +565,67 @@ function handleCSV(inp){
     });
     cos=[...cos,...lst];save();rAll();
     let msg=''+lst.length+'件インポートしました';
+    if(dupSkip.length)msg+='\n\n重複スキップ: '+dupSkip.length+'件';
     if(noPhone.length)msg+='\n\n電話番号なし（除外: '+noPhone.length+'件）';
     if(freeDial.length)msg+='\n\nフリーダイヤル（除外: '+freeDial.length+'件）';
     alert(msg);
   };
-  r.readAsText(file,'UTF-8');inp.value='';
+
+  if(isExcel){
+    if(typeof XLSX==='undefined'){alert('Excelライブラリを読み込み中です。数秒待ってもう一度お試しください。');return;}
+    var r=new FileReader();
+    r.onload=function(e){
+      try{
+        var wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+        var ws=wb.Sheets[wb.SheetNames[0]];
+        var rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+        doImport(rows);
+      }catch(err){alert('Excelの読み込みに失敗: '+err.message);}
+    };
+    r.readAsArrayBuffer(file);
+  }else{
+    var csvToRows=function(txt){
+      var lines=txt.split(/\r?\n/).filter(function(l){return l.trim();});
+      var sp=function(l){var res=[],cur='',q=false;for(var ch of l){if(ch==='"'){q=!q;}else if(ch===','&&!q){res.push(cur.trim());cur='';}else cur+=ch;}res.push(cur.trim());return res;};
+      return lines.map(function(l){return sp(l);});
+    };
+    var rSjis=new FileReader();
+    rSjis.onload=function(e){doImport(csvToRows(e.target.result));};
+    rSjis.onerror=function(){var rUtf=new FileReader();rUtf.onload=function(e){doImport(csvToRows(e.target.result));};rUtf.readAsText(file,'UTF-8');};
+    rSjis.readAsText(file,'Shift_JIS');
+  }
 }
+
+// ドラッグ&ドロップ
+(function(){
+  var dragC=0,ov=document.getElementById('drop-ov');
+  if(!ov)return;
+  document.body.addEventListener('dragenter',function(e){e.preventDefault();e.stopPropagation();dragC++;ov.classList.add('active');});
+  document.body.addEventListener('dragover',function(e){e.preventDefault();e.stopPropagation();});
+  document.body.addEventListener('dragleave',function(e){e.preventDefault();e.stopPropagation();dragC--;if(dragC<=0){dragC=0;ov.classList.remove('active');}});
+  document.body.addEventListener('drop',function(e){
+    e.preventDefault();e.stopPropagation();dragC=0;ov.classList.remove('active');
+    var files=e.dataTransfer?e.dataTransfer.files:null;
+    if(!files||!files.length)return;
+    var f=files[0];
+    if(/\.(csv|xlsx?)$/i.test(f.name))handleCSV(f);
+    else alert('CSV または Excel(.xlsx/.xls) のみ対応');
+  });
+})();
+
+// SheetJS非同期読み込み（Excel対応）
+(function(){
+  if(typeof XLSX!=='undefined')return;
+  var urls=['https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js','https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js'];
+  function tryLoad(i){
+    if(i>=urls.length)return;
+    var s=document.createElement('script');s.src=urls[i];
+    s.onload=function(){};
+    s.onerror=function(){tryLoad(i+1);};
+    document.head.appendChild(s);
+  }
+  tryLoad(0);
+})();
 
 function updateFilterOptions(){
   const sel=document.getElementById('fs');
