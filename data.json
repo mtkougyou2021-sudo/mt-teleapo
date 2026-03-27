@@ -5719,14 +5719,23 @@
     "address": "〒465-0008 愛知県名古屋市名東区猪子石原１丁目１３０７",
     "industry": "建設",
     "phone": "05277-2-9100",
-    "contactName": "",
+    "contactName": "やすえ様",
     "contactTitle": "",
     "memo": "",
-    "status": "未対応",
+    "status": "検討中",
     "nextAppointment": "",
-    "callHistory": [],
+    "callHistory": [
+      {
+        "id": 1774598484817,
+        "date": "2026/3/27 17:01:24",
+        "result": "見込み低",
+        "contact": "やすえ様",
+        "note": "とりあえずパンフレッドを送ってとのこと、DM送信OK",
+        "nextDate": ""
+      }
+    ],
     "createdAt": "2026-03-27T00:26:06.693Z",
-    "updatedAt": "2026-03-27T00:26:06.693Z"
+    "updatedAt": "2026-03-27T08:01:24.817Z"
   },
   {
     "id": "1774571166693-0.9007362834336796",
