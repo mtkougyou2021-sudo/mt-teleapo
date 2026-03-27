@@ -622,10 +622,20 @@
     "contactName": "",
     "contactTitle": "",
     "memo": "",
-    "status": "未対応",
+    "status": "アポ取得",
     "nextAppointment": "",
-    "callHistory": [],
-    "createdAt": "2026-03-12T04:58:45.158Z"
+    "callHistory": [
+      {
+        "id": 1774598427227,
+        "date": "2026/3/27 17:00:27",
+        "result": "アポ取得",
+        "contact": "",
+        "note": "",
+        "nextDate": ""
+      }
+    ],
+    "createdAt": "2026-03-12T04:58:45.158Z",
+    "updatedAt": "2026-03-27T08:00:27.227Z"
   },
   {
     "id": "1773291525158-0.6530213053222026",
