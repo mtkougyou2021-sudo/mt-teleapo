@@ -17728,14 +17728,23 @@
     "address": "〒510-0845 三重県四日市市海山道町１丁目１５５２−１",
     "industry": "建設",
     "phone": "05934-8-7745",
-    "contactName": "",
+    "contactName": "中村さん",
     "contactTitle": "",
     "memo": "",
-    "status": "未対応",
-    "nextAppointment": "",
-    "callHistory": [],
+    "status": "アポ取得",
+    "nextAppointment": "2026-04-01T16:43",
+    "callHistory": [
+      {
+        "id": 1775202251374,
+        "date": "2026/4/3 16:44:11",
+        "result": "アポ取得",
+        "contact": "中村さん",
+        "note": "四日市定修などやっているが、単価が安いのでそれでも良ければお願いします。",
+        "nextDate": "2026-04-01T16:43"
+      }
+    ],
     "createdAt": "2026-03-27T00:44:19.673Z",
-    "updatedAt": "2026-03-27T00:44:19.673Z"
+    "updatedAt": "2026-04-03T07:44:11.374Z"
   },
   {
     "id": "1774572259673-0.896215504621029",
