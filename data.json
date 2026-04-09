@@ -2391,13 +2391,23 @@
     "address": "",
     "industry": "プラント",
     "phone": "059-333-7531",
-    "contactName": "",
+    "contactName": "春田さん",
     "contactTitle": "",
     "memo": "",
-    "status": "未対応",
-    "nextAppointment": "",
-    "callHistory": [],
-    "createdAt": "2026-03-12T04:58:45.160Z"
+    "status": "アポ取得",
+    "nextAppointment": "2026-04-10T16:58",
+    "callHistory": [
+      {
+        "id": 1775721506600,
+        "date": "2026/4/9 16:58:26",
+        "result": "アポ取得",
+        "contact": "春田さん",
+        "note": "",
+        "nextDate": "2026-04-10T16:58"
+      }
+    ],
+    "createdAt": "2026-03-12T04:58:45.160Z",
+    "updatedAt": "2026-04-09T07:58:26.600Z"
   },
   {
     "id": "1773291525160-0.1696800498366191",
