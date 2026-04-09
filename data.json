@@ -18419,11 +18419,20 @@
     "contactName": "",
     "contactTitle": "",
     "memo": "",
-    "status": "未対応",
+    "status": "既存顧客",
     "nextAppointment": "",
-    "callHistory": [],
+    "callHistory": [
+      {
+        "id": 1775721871345,
+        "date": "2026/4/9 17:04:31",
+        "result": "既存顧客",
+        "contact": "",
+        "note": "",
+        "nextDate": ""
+      }
+    ],
     "createdAt": "2026-03-27T00:44:19.674Z",
-    "updatedAt": "2026-03-27T00:44:19.674Z"
+    "updatedAt": "2026-04-09T08:04:31.345Z"
   },
   {
     "id": "1774572259674-0.5761741016134377",
