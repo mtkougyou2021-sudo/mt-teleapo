@@ -254,13 +254,13 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
   <div class="modal-box">
     <div class="modal-handle"></div>
     <div class="modal-title" id="lmt">📞 架電記録</div>
-    <div style="margin-bottom:14px">
-      <div class="fl" style="margin-bottom:8px">架電結果 *</div>
-      <div class="rg" id="rb"></div>
-    </div>
     <div style="margin-bottom:12px">
       <div class="fl" style="margin-bottom:8px">ステータス更新</div>
       <div class="sg" id="sbg"></div>
+    </div>
+    <div style="margin-bottom:14px">
+      <div class="fl" style="margin-bottom:8px">架電結果 *</div>
+      <div class="rg" id="rb"></div>
     </div>
     <div style="margin-bottom:12px"><label class="fl">担当者名</label><input type="text" id="lcontact" placeholder="対応した担当者名"/></div>
     <div style="margin-bottom:12px"><label class="fl">次回アポ日時</label><input type="datetime-local" id="lap"/></div>
@@ -335,7 +335,7 @@ const DEFAULT_SL=[
   {v:'お断り',c:'#f87171',bg:'#2d0a0a',i:'✕'},
   {v:'検討中',c:'#fb923c',bg:'#2d1200',i:'💭'},
 ];
-const DEFAULT_CR=['不在','担当者不在','折り返し約束','アポ取得','お断り','検討中','再架電'];
+const DEFAULT_CR=['不在','お断り','架電'];
 const COLORS=['#94a3b8','#fbbf24','#818cf8','#38bdf8','#4ade80','#f87171','#fb923c','#a78bfa','#f472b6','#34d399','#fcd34d','#67e8f9'];
 const BGS=['#1e293b','#2d1f00','#1e1b4b','#0c2330','#052e16','#2d0a0a','#2d1200','#1e1040','#2d0a1a','#042f1e','#2d2600','#062c30'];
 
