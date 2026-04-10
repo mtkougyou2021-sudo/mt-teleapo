@@ -2012,10 +2012,20 @@
     "contactName": "",
     "contactTitle": "",
     "memo": "",
-    "status": "未対応",
+    "status": "既存顧客",
     "nextAppointment": "",
-    "callHistory": [],
-    "createdAt": "2026-03-12T04:58:45.159Z"
+    "callHistory": [
+      {
+        "id": 1775791605294,
+        "date": "2026/4/10 12:26:45",
+        "result": "既存顧客",
+        "contact": "",
+        "note": "",
+        "nextDate": ""
+      }
+    ],
+    "createdAt": "2026-03-12T04:58:45.159Z",
+    "updatedAt": "2026-04-10T03:26:45.295Z"
   },
   {
     "id": "1773291525159-0.16196190564818613",
