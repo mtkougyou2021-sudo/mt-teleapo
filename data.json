@@ -7354,9 +7354,18 @@
     "memo": "",
     "status": "未対応",
     "nextAppointment": "",
-    "callHistory": [],
+    "callHistory": [
+      {
+        "id": 1775791538151,
+        "date": "2026/4/10 12:25:38",
+        "result": "既存顧客",
+        "contact": "",
+        "note": "",
+        "nextDate": ""
+      }
+    ],
     "createdAt": "2026-03-27T00:43:35.151Z",
-    "updatedAt": "2026-03-27T00:43:35.151Z"
+    "updatedAt": "2026-04-10T03:25:38.151Z"
   },
   {
     "id": "1774572215151-0.5532264973167114",
