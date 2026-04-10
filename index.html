@@ -254,20 +254,20 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.
   <div class="modal-box">
     <div class="modal-handle"></div>
     <div class="modal-title" id="lmt">📞 架電記録</div>
-    <div style="margin-bottom:12px">
-      <div class="fl" style="margin-bottom:8px">ステータス更新</div>
-      <div class="sg" id="sbg"></div>
-    </div>
     <div style="margin-bottom:14px">
       <div class="fl" style="margin-bottom:8px">架電結果 *</div>
       <div class="rg" id="rb"></div>
     </div>
-    <div style="margin-bottom:12px"><label class="fl">担当者名</label><input type="text" id="lcontact" placeholder="対応した担当者名"/></div>
-    <div style="margin-bottom:12px"><label class="fl">次回アポ日時</label><input type="datetime-local" id="lap"/></div>
-    <div style="margin-bottom:18px">
-      <label class="fl" style="margin-bottom:8px">メモ（繁忙期・特記事項など）</label>
-      <textarea rows="3" id="lno" placeholder="例：繁忙期は4〜6月、決裁者は部長" style="font-size:13px;"></textarea>
+    <div style="margin-bottom:12px">
+      <div class="fl" style="margin-bottom:8px">ステータス更新</div>
+      <div class="sg" id="sbg"></div>
     </div>
+    <div style="margin-bottom:12px"><label class="fl">担当者名</label><input type="text" id="lcontact" placeholder="対応した担当者名"/></div>
+    <div style="margin-bottom:12px"><label class="fl">施工エリア</label><input type="text" id="larea" placeholder="施工エリア"/></div>
+    <div style="margin-bottom:12px"><label class="fl">繁忙期の時期</label><input type="text" id="lbusy" placeholder="例：4〜6月"/></div>
+    <div style="margin-bottom:12px"><label class="fl">主な工事種別</label><input type="text" id="lwork" placeholder="例：新築・改修・解体"/></div>
+    <div style="margin-bottom:12px"><label class="fl">下請け業者する体制</label><input type="text" id="lsub" placeholder="下請け業者の体制"/></div>
+    <div style="margin-bottom:18px"><label class="fl">現在の足場業者の状況</label><input type="text" id="lscaffold" placeholder="現在の足場業者の状況"/></div>
     <div class="ma">
       <button class="btn btn-p btn-full" onclick="saveLog()">保存する</button>
       <button class="btn btn-2" onclick="closeM('lm')" style="padding:14px 18px">キャンセル</button>
@@ -335,7 +335,7 @@ const DEFAULT_SL=[
   {v:'お断り',c:'#f87171',bg:'#2d0a0a',i:'✕'},
   {v:'検討中',c:'#fb923c',bg:'#2d1200',i:'💭'},
 ];
-const DEFAULT_CR=['不在','お断り','架電'];
+const DEFAULT_CR=['不在','お断り','折り返し待ち','担当者不在'];
 const COLORS=['#94a3b8','#fbbf24','#818cf8','#38bdf8','#4ade80','#f87171','#fb923c','#a78bfa','#f472b6','#34d399','#fcd34d','#67e8f9'];
 const BGS=['#1e293b','#2d1f00','#1e1b4b','#0c2330','#052e16','#2d0a0a','#2d1200','#1e1040','#2d0a1a','#042f1e','#2d2600','#062c30'];
 
@@ -765,8 +765,11 @@ function openLog(){
   lRes='';lStat=c.status;
   document.getElementById('lmt').textContent='📞 架電記録 — '+c.companyName;
   document.getElementById('lcontact').value=c.contactName||'';
-  document.getElementById('lap').value=c.nextAppointment||'';
-  document.getElementById('lno').value='';
+  document.getElementById('larea').value=c.constructionArea||'';
+  document.getElementById('lbusy').value=c.busySeason||'';
+  document.getElementById('lwork').value=c.workType||'';
+  document.getElementById('lsub').value=c.subcontractor||'';
+  document.getElementById('lscaffold').value=c.scaffoldStatus||'';
   document.getElementById('rb').innerHTML=CR.map(r=>`<button class="rb" onclick="selRes('${r}')">${r}</button>`).join('');
   document.getElementById('sbg').innerHTML=SL.map(s=>`<button class="sb" onclick="selStat('${s.v}')" style="background:${lStat===s.v?s.bg:'#0f2040'};color:${lStat===s.v?s.c:'#475569'};border-color:${lStat===s.v?s.c:'#1a3a6a'}">${s.v}</button>`).join('');
   openM('lm');
@@ -786,10 +789,14 @@ async function saveLog(){
   if(!lRes){alert('架電結果を選んでください');return;}
   const c=getSel();if(!c)return;
   const contact=document.getElementById('lcontact').value.trim();
-  const log={id:Date.now(),date:new Date().toLocaleString('ja-JP'),result:lRes,contact:contact,note:document.getElementById('lno').value,nextDate:document.getElementById('lap').value};
+  const log={id:Date.now(),date:new Date().toLocaleString('ja-JP'),result:lRes,contact:contact,area:document.getElementById('larea').value,busySeason:document.getElementById('lbusy').value,workType:document.getElementById('lwork').value,subcontractor:document.getElementById('lsub').value,scaffoldStatus:document.getElementById('lscaffold').value};
   c.callHistory=[log,...(c.callHistory||[])];c.status=lStat;
   if(contact)c.contactName=contact;
-  c.nextAppointment=document.getElementById('lap').value||c.nextAppointment;
+  c.constructionArea=document.getElementById('larea').value||c.constructionArea;
+  c.busySeason=document.getElementById('lbusy').value||c.busySeason;
+  c.workType=document.getElementById('lwork').value||c.workType;
+  c.subcontractor=document.getElementById('lsub').value||c.subcontractor;
+  c.scaffoldStatus=document.getElementById('lscaffold').value||c.scaffoldStatus;
   c.updatedAt=new Date().toISOString();
   closeM('lm');rAll();renderDetail();await save();
 }
