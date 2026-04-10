@@ -1498,10 +1498,20 @@
     "contactName": "",
     "contactTitle": "",
     "memo": "",
-    "status": "未対応",
+    "status": "既存顧客",
     "nextAppointment": "",
-    "callHistory": [],
-    "createdAt": "2026-03-12T04:58:45.159Z"
+    "callHistory": [
+      {
+        "id": 1775791585141,
+        "date": "2026/4/10 12:26:25",
+        "result": "既存顧客",
+        "contact": "",
+        "note": "",
+        "nextDate": ""
+      }
+    ],
+    "createdAt": "2026-03-12T04:58:45.159Z",
+    "updatedAt": "2026-04-10T03:26:25.141Z"
   },
   {
     "id": "1773291525159-0.12954862014839497",
